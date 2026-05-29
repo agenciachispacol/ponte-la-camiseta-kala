@@ -66,96 +66,102 @@ const NEGATIVE_BASE = [
 ];
 
 // ─────────────────────────────────────────────
-// LÓGICA DE COMPLEXIÓN
+// LÓGICA DE COMPLEXIÓN (basada en IMC)
+//
+// IMC = peso / (altura_m)^2  → estándar real de contextura.
+// 6 niveles por género + descriptor de estatura/frame.
+// Los umbrales siguen las franjas médicas de IMC pero con
+// más granularidad para mayor fidelidad visual.
 // ─────────────────────────────────────────────
+
+/** Calcula el índice de masa corporal. */
+function calcularIMC(altura, peso) {
+  const m = altura / 100;
+  return peso / (m * m);
+}
+
+/** Descriptor de estatura según género (cm). */
+function frameEstatura(genero, altura) {
+  const esHombre = genero === 'Hombre';
+  if (esHombre) {
+    if (altura < 165) return 'short stature, compact frame';
+    if (altura < 178) return 'average height';
+    if (altura < 188) return 'tall, long-limbed frame';
+    return 'very tall, towering frame';
+  }
+  if (altura < 158) return 'short stature, petite frame';
+  if (altura < 170) return 'average height';
+  if (altura < 178) return 'tall, long-limbed frame';
+  return 'very tall stature';
+}
+
+// Tabla de 6 niveles por IMC. min es inclusivo; el último cubre el resto.
+const TIERS_HOMBRE = [
+  { max: 17.5, label: 'Muy delgado',
+    desc: 'Very lean, slender frame. Narrow shoulders, thin arms and legs, minimal body mass, visible slimness. The jersey hangs loosely on a thin frame.',
+    neg: ['overweight', 'heavy', 'muscular', 'broad shoulders', 'thick torso', 'belly'] },
+  { max: 21,   label: 'Delgado',
+    desc: 'Slim, lean build. Lean torso, average-width shoulders, slim arms and legs, naturally light frame, flat stomach without muscle definition.',
+    neg: ['overweight', 'fat', 'bulky', 'muscular', 'bodybuilder', 'wide torso'] },
+  { max: 25,   label: 'Promedio / Atlético',
+    desc: 'Average everyday build. Balanced chest and torso, normal neck thickness, proportionate shoulders and arms, lightly toned but not athletic-defined.',
+    neg: ['obese', 'six pack abs', 'bodybuilder physique', 'anorexic thin', 'superhero physique'] },
+  { max: 28,   label: 'Sólido / Fornido',
+    desc: 'Solid, sturdy build. Broader chest and torso, slightly thicker neck, a bit of midsection softness, strong everyday frame carrying some extra weight naturally.',
+    neg: ['slim', 'lean', 'six pack abs', 'skinny', 'bodybuilder', 'model physique'] },
+  { max: 32,   label: 'Robusto / Corpulento',
+    desc: 'Heavy-set stocky build. Broad torso, thick neck, wide shoulders, clearly visible belly volume, sturdy legs, full-figured larger body. The jersey fits snugly over a bigger body.',
+    neg: ['slim', 'lean body', 'athletic build', 'six pack abs', 'muscular', 'model-like', 'ripped'] },
+  { max: Infinity, label: 'Muy corpulento',
+    desc: 'Large, plus-size build. Very broad and heavy torso, thick neck and arms, prominent rounded belly, big legs, authentically large body. The jersey stretches over a big frame.',
+    neg: ['slim', 'lean', 'athletic', 'muscular', 'average build', 'model-like'] },
+];
+
+const TIERS_MUJER = [
+  { max: 17.5, label: 'Muy delgada',
+    desc: 'Very slim, delicate frame. Narrow shoulders and hips, thin limbs, minimal curves, fine slender silhouette.',
+    neg: ['overweight', 'curvy', 'wide hips', 'heavy', 'plus size', 'muscular'] },
+  { max: 21,   label: 'Delgada / Estilizada',
+    desc: 'Slim, slender build. Lean figure, defined waist, narrow hips, light frame, subtle natural curves.',
+    neg: ['overweight', 'fat', 'plus size', 'bulky', 'wide hips', 'muscular'] },
+  { max: 25,   label: 'Promedio / Atlética',
+    desc: 'Average, balanced figure. Toned but natural, moderate curves, proportionate shoulders and hips, everyday healthy build.',
+    neg: ['obese', 'anorexic', 'bodybuilder', 'extreme muscles', 'runway-model thin'] },
+  { max: 28,   label: 'Con curvas',
+    desc: 'Soft curvy build. Fuller chest and hips, rounded softer waistline, feminine curves carrying some extra weight naturally.',
+    neg: ['slim', 'skinny', 'flat stomach', 'wasp waist', 'fitness model', 'athletic'] },
+  { max: 32,   label: 'Robusta / Curvy',
+    desc: 'Full-figured curvy build. Rounded shoulders, full chest, softer abdomen, wide hips and thighs, authentic plus-size proportions. The jersey fits over a fuller body.',
+    neg: ['slim', 'thin', 'model thin', 'supermodel', 'wasp waist', 'flat stomach', 'athletic'] },
+  { max: Infinity, label: 'Plus / Voluminosa',
+    desc: 'Large plus-size build. Very full figure, broad soft torso, large chest, wide hips and thighs, rounded belly, authentically big body.',
+    neg: ['slim', 'thin', 'average build', 'athletic', 'model-like', 'fit'] },
+];
 
 /**
  * @param {string} genero  - "Hombre" | "Mujer"
  * @param {number} altura  - cm
  * @param {number} peso    - kg
- * @returns {{ bodyDescription: string, negativeAddons: string[], label: string }}
+ * @returns {{ bodyDescription, negativeAddons, label, imc }}
  */
 function determinarComplexion(genero, altura, peso) {
-  const ratio = peso / altura;
-  let bodyDescription = '';
-  let negativeAddons = [];
-  let label = '';
+  const imc   = calcularIMC(altura, peso);
+  const frame = frameEstatura(genero, altura);
+  const tiers = genero === 'Mujer' ? TIERS_MUJER : TIERS_HOMBRE;
+  const sexo  = genero === 'Mujer' ? 'Female' : 'Male';
 
-  if (genero === 'Hombre') {
-    if (ratio > 0.55) {
-      label = 'Robusto / Corpulento';
-      bodyDescription =
-        `Male, ${altura}cm tall, ${peso}kg. ` +
-        'Natural heavy-set stocky build. Broad chest and torso, thick neck, wide shoulders, ' +
-        'visible abdominal volume, sturdy legs, full-figured body. ' +
-        'Real person with a larger frame. The jersey fits snugly on a bigger body. ' +
-        'DO NOT make him slim, athletic, lean, muscular, or model-like. ' +
-        'His body is authentically large and natural.';
-      negativeAddons = ['slim', 'lean body', 'six pack abs', 'bodybuilder physique',
-        'muscular definition', 'athletic build', 'male model physique', 'ripped'];
+  const tier = tiers.find(t => imc < t.max) || tiers[tiers.length - 1];
 
-    } else if (ratio < 0.40) {
-      label = 'Delgado / Ectomorfo';
-      bodyDescription =
-        `Male, ${altura}cm tall, ${peso}kg. ` +
-        'Natural slim ectomorphic build. Lean torso, defined neck, average-width shoulders, ' +
-        'thin arms and legs, lightweight naturally thin frame. ' +
-        'The jersey hangs slightly on a slim frame. ' +
-        'DO NOT make him heavy, bulky, overweight, or muscular.';
-      negativeAddons = ['overweight', 'heavy', 'fat', 'chubby', 'bulky', 'wide torso',
-        'thick neck', 'broad shoulders', 'muscular'];
+  const bodyDescription =
+    `${sexo}, ${altura}cm tall, ${peso}kg (BMI ${imc.toFixed(1)}), ${frame}. ` +
+    `${tier.desc} Real, authentic ${sexo.toLowerCase()} body proportions — not idealized.`;
 
-    } else {
-      label = 'Atlético / Medio';
-      bodyDescription =
-        `Male, ${altura}cm tall, ${peso}kg. ` +
-        'Natural average-athletic build. Balanced chest and torso, normal neck thickness, ' +
-        'proportionate shoulders and arms, moderately toned everyday physique. ' +
-        'DO NOT make him extremely muscular, overweight, or model-thin.';
-      negativeAddons = ['extreme bodybuilder muscles', 'obese', 'morbidly overweight',
-        'anorexic thin', 'superhero physique'];
-    }
-
-  } else if (genero === 'Mujer') {
-    if (ratio > 0.50) {
-      label = 'Robusta / Curvy';
-      bodyDescription =
-        `Female, ${altura}cm tall, ${peso}kg. ` +
-        'Natural full-figured curvy build. Rounded shoulders, fuller chest, ' +
-        'softer abdominal area, wider hips and thighs, authentic plus-size proportions. ' +
-        'Real woman with a larger frame. The jersey fits naturally on a fuller body. ' +
-        'DO NOT make her slim, thin, or model-like.';
-      negativeAddons = ['slim', 'skinny', 'model thin', 'supermodel', 'wasp waist',
-        'athletic', 'fitness model', 'flat stomach'];
-
-    } else if (ratio < 0.38) {
-      label = 'Delgada / Estilizada';
-      bodyDescription =
-        `Female, ${altura}cm tall, ${peso}kg. ` +
-        'Natural slim petite build. Lean figure, defined waist, narrow hips, ' +
-        'lightweight naturally slender frame. ' +
-        'DO NOT make her heavy, overweight, or bulky.';
-      negativeAddons = ['overweight', 'heavy', 'fat', 'chubby', 'plus size',
-        'wide hips', 'muscular', 'bulky'];
-
-    } else {
-      label = 'Atlética / Media';
-      bodyDescription =
-        `Female, ${altura}cm tall, ${peso}kg. ` +
-        'Natural average athletic build. Toned figure, balanced proportions, ' +
-        'moderate curves, fit without being extreme. ' +
-        'DO NOT make her extremely muscular, overweight, or runway-model thin.';
-      negativeAddons = ['extreme muscles', 'overweight', 'obese', 'anorexic',
-        'bodybuilder', 'very muscular'];
-    }
-
-  } else {
-    label = 'Neutral';
-    bodyDescription =
-      `Person, ${altura}cm tall, ${peso}kg. Natural realistic body proportions.`;
-  }
-
-  return { bodyDescription, negativeAddons, label };
+  return {
+    bodyDescription,
+    negativeAddons: tier.neg,
+    label: tier.label,
+    imc: Number(imc.toFixed(1)),
+  };
 }
 
 // ─────────────────────────────────────────────
@@ -172,7 +178,7 @@ function determinarComplexion(genero, altura, peso) {
  * @returns {{ positivePrompt: string, negativePrompt: string, metadata: object }}
  */
 function construirPromptFinal({ genero, altura, peso }) {
-  const { bodyDescription, negativeAddons, label } = determinarComplexion(genero, altura, peso);
+  const { bodyDescription, negativeAddons, label, imc } = determinarComplexion(genero, altura, peso);
 
   const seccionBody = `BODY: ${bodyDescription}`;
   const positivePrompt = PROMPT_BASE.replace('{SECCION_BODY}', seccionBody);
@@ -185,7 +191,7 @@ function construirPromptFinal({ genero, altura, peso }) {
       genero,
       altura,
       peso,
-      ratio: (peso / altura).toFixed(3),
+      imc,
       complexion: label,
     },
   };

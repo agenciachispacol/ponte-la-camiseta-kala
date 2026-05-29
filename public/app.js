@@ -272,19 +272,32 @@ function syncSlider(sliderId, labelId, unit) {
 /* ═══════════════════════════════════════════════
    COMPLEXIÓN CHIP
    ═══════════════════════════════════════════════ */
-function updateComplexion() {
-  const ratio = state.peso / state.altura;
-  let label   = '';
+// 6 niveles por IMC — debe coincidir con server/promptBuilder.js
+const TIERS_CHIP = {
+  Hombre: [
+    { max: 17.5, txt: '🏃 Muy delgado' },
+    { max: 21,   txt: '🏃 Delgado' },
+    { max: 25,   txt: '⚡ Promedio / atlético' },
+    { max: 28,   txt: '💪 Sólido / fornido' },
+    { max: 32,   txt: '💪 Robusto / corpulento' },
+    { max: Infinity, txt: '💪 Muy corpulento' },
+  ],
+  Mujer: [
+    { max: 17.5, txt: '🏃 Muy delgada' },
+    { max: 21,   txt: '🏃 Delgada / estilizada' },
+    { max: 25,   txt: '⚡ Promedio / atlética' },
+    { max: 28,   txt: '✨ Con curvas' },
+    { max: 32,   txt: '✨ Robusta / curvy' },
+    { max: Infinity, txt: '✨ Plus / voluminosa' },
+  ],
+};
 
-  if (state.genero === 'Hombre') {
-    if      (ratio > 0.55) label = '💪 Complexión robusta / corpulenta';
-    else if (ratio < 0.40) label = '🏃 Complexión delgada / ectomorfa';
-    else                   label = '⚡ Complexión atlética / media';
-  } else {
-    if      (ratio > 0.50) label = '✨ Complexión robusta / curvy';
-    else if (ratio < 0.38) label = '🏃 Complexión delgada / estilizada';
-    else                   label = '⚡ Complexión atlética / media';
-  }
+function updateComplexion() {
+  const m   = state.altura / 100;
+  const imc = state.peso / (m * m);
+  const tiers = TIERS_CHIP[state.genero] || TIERS_CHIP.Hombre;
+  const tier  = tiers.find(t => imc < t.max) || tiers[tiers.length - 1];
+  const label = `${tier.txt} · IMC ${imc.toFixed(1)}`;
 
   const chip = document.getElementById('complexion-chip');
   const txt  = document.getElementById('complexion-txt');
