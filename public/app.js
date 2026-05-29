@@ -13,6 +13,8 @@ const state = {
   currentStep:   1,
   selfieFile:    null,
   selfieURL:     null,   // object URL para preview
+  selfieBase64:  null,   // base64 redimensionado (sin prefijo data:)
+  selfieMime:    'image/jpeg',
   genero:        'Hombre',
   altura:        170,
   peso:          70,
@@ -187,8 +189,41 @@ function processFile(file) {
   document.getElementById('upload-empty').classList.add('hidden');
   document.getElementById('upload-preview').classList.remove('hidden');
 
-  // Habilitar botón siguiente
-  document.getElementById('btn-step1').disabled = false;
+  // Redimensionar a base64 (para enviar liviano al backend serverless)
+  document.getElementById('btn-step1').disabled = true;
+  resizeToBase64(file, 1024).then(({ base64, mime }) => {
+    state.selfieBase64 = base64;
+    state.selfieMime   = mime;
+    document.getElementById('btn-step1').disabled = false;
+  }).catch(() => {
+    showUploadError('No se pudo procesar la imagen. Probá con otra.');
+  });
+}
+
+/**
+ * Redimensiona una imagen a un lado máximo y la devuelve como base64 JPEG.
+ * Mantiene el payload bajo el límite de Vercel (~4.5MB) y acelera la subida.
+ */
+function resizeToBase64(file, maxDim) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        if (width >= height) { height = Math.round(height * maxDim / width); width = maxDim; }
+        else                 { width  = Math.round(width  * maxDim / height); height = maxDim; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      resolve({ base64: dataUrl.split(',')[1], mime: 'image/jpeg' });
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
 }
 
 function showUploadError(msg) {
@@ -264,7 +299,7 @@ function updateComplexion() {
    GENERAR IMAGEN — llamada al backend
    ═══════════════════════════════════════════════ */
 async function generateImage() {
-  if (!state.selfieFile) {
+  if (!state.selfieBase64) {
     alert('Por favor sube una selfie primero.');
     goStep(1);
     return;
@@ -277,16 +312,16 @@ async function generateImage() {
   startLoadingAnimation();
 
   try {
-    // Construir FormData
-    const formData = new FormData();
-    formData.append('selfie',  state.selfieFile);
-    formData.append('genero',  state.genero);
-    formData.append('altura',  state.altura);
-    formData.append('peso',    state.peso);
-
     const response = await fetch('/api/generate', {
-      method: 'POST',
-      body:   formData,
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        selfie:     state.selfieBase64,
+        selfieMime: state.selfieMime,
+        genero:     state.genero,
+        altura:     state.altura,
+        peso:       state.peso,
+      }),
     });
 
     const data = await response.json();
@@ -295,10 +330,11 @@ async function generateImage() {
       throw new Error(data.error || 'Error al generar la imagen.');
     }
 
-    state.resultImageUrl = data.imageUrl;
+    const imageUrl = data.imageDataUrl || data.imageUrl;
+    state.resultImageUrl = imageUrl;
 
     // Avanzar al resultado
-    finishLoadingAnimation(() => showResult(data.imageUrl));
+    finishLoadingAnimation(() => showResult(imageUrl));
 
   } catch (err) {
     console.error('[APP] Error:', err);
@@ -460,6 +496,7 @@ function resetForm() {
   // Reset estado
   state.currentStep    = 1;
   state.selfieFile     = null;
+  state.selfieBase64   = null;
   state.resultImageUrl = null;
   if (state.selfieURL) {
     URL.revokeObjectURL(state.selfieURL);

@@ -5,9 +5,8 @@ node_modules/
 .env
 .env.local
 
-# Archivos temporales de usuarios (selfies + resultados)
-uploads/*
-!uploads/.gitkeep
+# Vercel
+.vercel
 
 # Logs
 *.log

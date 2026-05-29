@@ -1,38 +1,39 @@
 /**
- * aiClient.js — Cliente de IA para KALA Campaign
+ * aiClient.js — Cliente de IA para KALA Campaign (serverless-ready)
  *
  * Modelos:
  *   GEMINI:  gemini-3-pro-image  (análisis facial + generación de imagen)
  *   OPENAI:  gpt-image-2         (alternativa OpenAI)
  *
- * Flujo en 2 pasos:
- *   1. Análisis facial → Gemini 3 Pro Image describe los rasgos del usuario
- *   2. Generación de imagen → Gemini 3 Pro Image genera el retrato KALA
+ * La imagen del usuario se recibe como { base64, mimeType } — NO como ruta
+ * de disco — para funcionar igual en Express local y en funciones serverless
+ * (Vercel), donde el sistema de archivos es efímero/solo-lectura.
  */
 
 'use strict';
 
-const fs    = require('fs');
-const path  = require('path');
-const fetch = require('node-fetch');
+const fs   = require('fs');
+const path = require('path');
 
 // ─────────────────────────────────────────────
 // Imágenes de referencia fijas (camiseta + balón)
+// Se cargan UNA vez a base64 al iniciar el módulo.
 // ─────────────────────────────────────────────
-const REFS_DIR     = path.join(__dirname, '..', 'refs');
-const JERSEY_REF    = path.join(REFS_DIR, 'camiseta-kala.jpeg');
-const BALL_REF      = path.join(REFS_DIR, 'balon.jpeg');
+const REFS_DIR   = path.join(__dirname, '..', 'refs');
+const JERSEY_REF = path.join(REFS_DIR, 'camiseta-kala.jpeg');
+const BALL_REF   = path.join(REFS_DIR, 'balon.jpeg');
 
-/** Lee una imagen de disco y la devuelve como part inlineData de Gemini. */
-function fileToInlinePart(filePath) {
-  if (!filePath || !fs.existsSync(filePath)) return null;
-  const buf      = fs.readFileSync(filePath);
-  const ext      = filePath.toLowerCase();
-  const mimeType = ext.endsWith('.png') ? 'image/png'
-                 : ext.endsWith('.webp') ? 'image/webp'
-                 : 'image/jpeg';
-  return { inlineData: { mimeType, data: buf.toString('base64') } };
+function loadRef(filePath) {
+  try {
+    if (!fs.existsSync(filePath)) return null;
+    return { base64: fs.readFileSync(filePath).toString('base64'), mimeType: 'image/jpeg' };
+  } catch (_) {
+    return null;
+  }
 }
+
+const JERSEY_IMG = loadRef(JERSEY_REF);
+const BALL_IMG   = loadRef(BALL_REF);
 
 // ─────────────────────────────────────────────
 // SDKs (cargados por demanda)
@@ -52,17 +53,16 @@ function openaiClient() {
   return new _OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 }
 
-// ─────────────────────────────────────────────
-// PASO 1 — Análisis facial con Gemini 3 Pro Image
-// Lee la selfie y devuelve descripción textual
-// de los rasgos para enriquecer el prompt.
-// ─────────────────────────────────────────────
-async function analyzeFace(imagePath) {
-  const provider = (process.env.AI_PROVIDER || 'gemini').toLowerCase();
+function inlinePart(img) {
+  return img ? { inlineData: { mimeType: img.mimeType, data: img.base64 } } : null;
+}
 
-  const imageBuffer = fs.readFileSync(imagePath);
-  const base64      = imageBuffer.toString('base64');
-  const mimeType    = imagePath.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
+// ─────────────────────────────────────────────
+// PASO 1 — Análisis facial
+// Recibe { base64, mimeType } y devuelve descripción textual.
+// ─────────────────────────────────────────────
+async function analyzeFace(faceImg) {
+  const provider = (process.env.AI_PROVIDER || 'gemini').toLowerCase();
 
   const instruction =
     'Describe this person\'s facial features accurately for ultra-realistic AI portrait generation. ' +
@@ -80,7 +80,7 @@ async function analyzeFace(imagePath) {
       messages: [{
         role: 'user',
         content: [
-          { type: 'image_url', image_url: { url: `data:${mimeType};base64,${base64}` } },
+          { type: 'image_url', image_url: { url: `data:${faceImg.mimeType};base64,${faceImg.base64}` } },
           { type: 'text', text: instruction },
         ],
       }],
@@ -89,11 +89,11 @@ async function analyzeFace(imagePath) {
     return res.choices[0].message.content;
   }
 
-  // ── Gemini 3 Pro Image — visión ──────────────
+  // ── Gemini — visión ──────────────────────────
   const genAI = geminiClient();
   const model = genAI.getGenerativeModel({ model: 'gemini-3-pro-image' });
   const result = await model.generateContent([
-    { inlineData: { mimeType, data: base64 } },
+    inlinePart(faceImg),
     { text: instruction },
   ]);
   return result.response.text();
@@ -101,42 +101,31 @@ async function analyzeFace(imagePath) {
 
 // ─────────────────────────────────────────────
 // PASO 2A — Gemini 3 Pro Image (generación)
-// Toma la selfie y el prompt → retrato KALA
 // ─────────────────────────────────────────────
-async function generateWithGemini3(positivePrompt, imagePath) {
+async function generateWithGemini3(positivePrompt, faceImg) {
   const genAI = geminiClient();
   const model = genAI.getGenerativeModel({ model: 'gemini-3-pro-image' });
 
   const parts = [];
 
-  // ── Referencia 1: rostro del usuario (identidad) ──
-  const facePart = fileToInlinePart(imagePath);
-  if (facePart) {
+  if (faceImg) {
     parts.push({ text: 'FACE REFERENCE — replicate this exact person\'s face and identity:' });
-    parts.push(facePart);
+    parts.push(inlinePart(faceImg));
   }
-
-  // ── Referencia 2: camiseta KALA (diseño exacto) ──
-  const jerseyPart = fileToInlinePart(JERSEY_REF);
-  if (jerseyPart) {
+  if (JERSEY_IMG) {
     parts.push({ text: 'JERSEY REFERENCE — the person must wear THIS exact white KALA jersey with the navy "kala" wordmark:' });
-    parts.push(jerseyPart);
+    parts.push(inlinePart(JERSEY_IMG));
   }
-
-  // ── Referencia 3: balón oficial (diseño exacto) ──
-  const ballPart = fileToInlinePart(BALL_REF);
-  if (ballPart) {
+  if (BALL_IMG) {
     parts.push({ text: 'BALL REFERENCE — the person must hold THIS exact adidas TRIONDA match ball:' });
-    parts.push(ballPart);
+    parts.push(inlinePart(BALL_IMG));
   }
 
   parts.push({ text: positivePrompt });
 
   const result = await model.generateContent({
     contents: [{ role: 'user', parts }],
-    generationConfig: {
-      responseModalities: ['IMAGE', 'TEXT'],
-    },
+    generationConfig: { responseModalities: ['IMAGE', 'TEXT'] },
   });
 
   const candidate = result.response.candidates?.[0];
@@ -157,33 +146,8 @@ async function generateWithGemini3(positivePrompt, imagePath) {
 // ─────────────────────────────────────────────
 // PASO 2B — GPT-image-2 (OpenAI alternativa)
 // ─────────────────────────────────────────────
-async function generateWithGPTImage2(positivePrompt, imagePath) {
+async function generateWithGPTImage2(positivePrompt) {
   const oai = openaiClient();
-
-  // Con selfie: usar image edit para máxima fidelidad facial.
-  // gpt-image-2 acepta múltiples imágenes: selfie + camiseta + balón.
-  if (imagePath && fs.existsSync(imagePath)) {
-    try {
-      const images = [fs.createReadStream(imagePath)];
-      if (fs.existsSync(JERSEY_REF)) images.push(fs.createReadStream(JERSEY_REF));
-      if (fs.existsSync(BALL_REF))   images.push(fs.createReadStream(BALL_REF));
-
-      const res = await oai.images.edit({
-        model:  'gpt-image-2',
-        image:  images,
-        prompt: positivePrompt,
-        n:      1,
-        size:   '1024x1536',
-      });
-      const img = res.data[0];
-      if (img.b64_json) return { type: 'base64', data: img.b64_json, mimeType: 'image/png' };
-      if (img.url)      return { type: 'url', url: img.url };
-    } catch (editErr) {
-      console.warn('[AI] gpt-image-2 edit falló, usando generate:', editErr.message);
-    }
-  }
-
-  // Fallback: generación pura texto
   const res = await oai.images.generate({
     model:   'gpt-image-2',
     prompt:  positivePrompt,
@@ -199,37 +163,33 @@ async function generateWithGPTImage2(positivePrompt, imagePath) {
 
 // ─────────────────────────────────────────────
 // FUNCIÓN PRINCIPAL — generatePortrait
+// @param {object} params
+// @param {string} params.positivePrompt
+// @param {string} params.negativePrompt
+// @param {object} params.faceImage  { base64, mimeType }
 // ─────────────────────────────────────────────
-async function generatePortrait({ positivePrompt, negativePrompt, imagePath }) {
+async function generatePortrait({ positivePrompt, negativePrompt, faceImage }) {
   const provider = (process.env.AI_PROVIDER || 'gemini').toLowerCase();
 
-  console.log(`\n[AI] ── Iniciando generación ──`);
-  console.log(`[AI] Provider : ${provider}`);
-  console.log(`[AI] Modelo   : ${provider === 'openai' ? 'gpt-image-2' : 'gemini-3-pro-image'}`);
+  console.log(`[AI] Provider: ${provider} | Modelo: ${provider === 'openai' ? 'gpt-image-2' : 'gemini-3-pro-image'}`);
 
   // PASO 1 — Analizar cara
-  console.log('[AI] Paso 1: Analizando rasgos faciales...');
   let faceDescription = '';
   try {
-    faceDescription = await analyzeFace(imagePath);
-    console.log('[AI] Descripción:', faceDescription.slice(0, 80) + '...');
+    if (faceImage) faceDescription = await analyzeFace(faceImage);
   } catch (err) {
     console.warn('[AI] Análisis facial falló (continúa sin él):', err.message);
   }
 
-  // Enriquecer prompt con descripción facial
   const enrichedPrompt = faceDescription
     ? `${positivePrompt}\n\nFACE PRECISE DESCRIPTION FROM REFERENCE PHOTO: ${faceDescription}`
     : positivePrompt;
 
   // PASO 2 — Generar imagen
-  console.log('[AI] Paso 2: Generando retrato hiperrealista...');
-
   if (provider === 'openai') {
-    return generateWithGPTImage2(enrichedPrompt, imagePath);
+    return generateWithGPTImage2(enrichedPrompt);
   }
-
-  return generateWithGemini3(enrichedPrompt, imagePath);
+  return generateWithGemini3(enrichedPrompt, faceImage);
 }
 
 module.exports = { generatePortrait, analyzeFace };
