@@ -483,14 +483,14 @@ async function downloadImage() {
    ═══════════════════════════════════════════════ */
 function shareWhatsApp() {
   const text = encodeURIComponent(
-    '¡Ya tengo la camiseta KALA puesta y armé mi retrato deportivo! 🏟️⚽ Yo #SoyKala'
+    '¡Ya tengo la camiseta KALA puesta! Esta es mi nueva foto de perfil 🏟️⚽ Yo #SoyKala'
   );
   window.open(`https://wa.me/?text=${text}`, '_blank');
 }
 
 function shareTwitter() {
   const text = encodeURIComponent(
-    'Me puse la camiseta KALA y armé mi retrato deportivo 🏟️⚽🔥 Yo #SoyKala'
+    'Me puse la camiseta KALA y esta es mi nueva foto de perfil 🏟️⚽🔥 Yo #SoyKala'
   );
   window.open(`https://x.com/intent/tweet?text=${text}`, '_blank');
 }
@@ -498,7 +498,7 @@ function shareTwitter() {
 function shareInstagram() {
   // Instagram no permite share directo vía URL — mostrar instrucción
   downloadImage().then(() => {
-    alert('📲 Imagen descargada.\nSubila a tu feed o historias y etiquetá con #SoyKala');
+    alert('📲 Imagen descargada.\nPonla de foto de perfil y súbela a tu feed o historias con #SoyKala para participar por el premio.');
   });
 }
 
