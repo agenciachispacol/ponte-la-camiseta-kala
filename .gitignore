@@ -1,0 +1,18 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno (contienen API keys)
+.env
+.env.local
+
+# Archivos temporales de usuarios (selfies + resultados)
+uploads/*
+!uploads/.gitkeep
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema
+.DS_Store
+Thumbs.db
