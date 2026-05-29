@@ -11,49 +11,49 @@
 // {SECCION_BODY} es reemplazado dinámicamente
 // ─────────────────────────────────────────────
 const PROMPT_BASE = `
-Ultra-realistic sports photography portrait.
-Camera: Sony A7R IV, 85mm f/1.8, shallow depth of field.
-Award-winning photojournalistic quality, 8K resolution, grain-free.
+TASK: This is a PHOTO EDIT, not a new portrait. Take the EXACT person shown in the FACE
+REFERENCE photo and place them in a football stadium wearing the KALA jersey.
 
-SETTING: Packed nighttime football stadium, Colombia, dramatic stadium floodlights
-casting sharp shadows on the person, electric green pitch visible background,
-crowd blurred in cool blue bokeh, subtle pyrotechnic smoke effects, cinematic atmosphere,
-sky deep blue-black with stadium glow.
+#1 RULE — IDENTITY LOCK: The face and identity MUST stay IDENTICAL to the FACE REFERENCE
+photo. Keep the same facial features, exact face shape and bone structure, same eyes, nose,
+mouth and jawline, same skin tone, same hair, same approximate age and the same person's
+look. The result must be unmistakably the SAME individual — as if this real person posed for
+the photo. DO NOT beautify, slim the face, change age, swap to a different or "ideal" face,
+or turn them into a model. Preserve their real, recognizable face above everything else.
 
-JERSEY: Wearing the official KALA football jersey shown in the JERSEY REFERENCE image —
+FRAMING: Waist-up to three-quarter body shot. The face is clearly visible, well lit and large
+enough to be fully recognizable. Sharp focus on the face.
+
+SETTING: Packed nighttime football stadium, Colombia, dramatic stadium floodlights,
+electric green pitch in the background, crowd blurred in cool blue bokeh, subtle haze,
+cinematic atmosphere, sky deep blue-black with stadium glow.
+
+JERSEY: Dress the person in the official KALA jersey from the JERSEY REFERENCE image —
 a clean WHITE performance jersey with a navy-blue "kala" wordmark across the chest and a
-small navy "k" logo on the upper right chest, V-neck collar with subtle navy trim, modern
-athletic cut with tonal white-on-white diagonal panel texture. Reproduce the jersey design,
-colors, logo placement and proportions EXACTLY as in the reference image. Authentic fabric
-texture and natural fit according to body type. The jersey looks real and worn, not CGI.
+small navy "k" logo on the upper right chest, V-neck with subtle navy trim. Reproduce the
+jersey design, colors and logo placement EXACTLY. Real fabric texture, natural fit, not CGI.
 
-BALL: Holding the official match football shown in the BALL REFERENCE image — an adidas
-TRIONDA FIFA World Cup ball, white base with vivid multicolor panels (red, green, blue) and
-the adidas three-stripe and FIFA marks. Held in hands at waist height or casually under one
-arm. Reproduce the ball pattern and colors EXACTLY as in the reference image, with realistic
-panel texture and stadium light reflections.
+BALL: The person holds the official match ball from the BALL REFERENCE image — an adidas
+TRIONDA ball, white base with vivid multicolor panels (red, green, blue). Held at waist
+height or under one arm. Reproduce its pattern and colors EXACTLY.
 
 {SECCION_BODY}
 
-POSE: Confident, proud athlete stance, three-quarter body view angle, 
-natural and relaxed posture that matches the body type authentically. 
-Not a model pose — a real person proud of their team.
+POSE: Confident, proud, natural athlete stance. A real person proud of their team, not a
+fashion model pose.
 
-LIGHTING: Professional three-point lighting — key light from stadium floodlights 
-above at 45°, soft fill from pitch green reflection below, strong rim light from 
-stadium arc lights behind creating athlete halo effect. Dramatic, cinematic.
-
-FACE: Highly detailed photorealistic face. Exact skin texture, pores visible, 
-natural expression — confident slight smile. Eyes sharp and clear.
-
-TECHNICAL: Photorealistic, no AI artifacts, anatomically correct proportions, 
-natural fabric physics and wrinkles, correct hand anatomy, authentic stadium atmosphere.
+LIGHTING & QUALITY: Cinematic stadium lighting, soft key light on the face so it stays clearly
+recognizable, gentle rim light. Ultra-realistic photograph, natural skin texture with visible
+pores, no plastic/over-smoothed skin, correct hand anatomy, photojournalistic quality.
 `.trim();
 
 // ─────────────────────────────────────────────
 // NEGATIVOS BASE (siempre incluidos)
 // ─────────────────────────────────────────────
 const NEGATIVE_BASE = [
+  'different person', 'different face', 'changed identity', 'face swap',
+  'beautified face', 'idealized face', 'younger face', 'older face', 'model face',
+  'generic face', 'unrecognizable', 'altered facial features',
   'CGI', 'illustration', 'cartoon', 'animation', 'painting', 'drawing', 'render',
   'AI look', 'plastic skin', 'smooth skin', 'uncanny valley', 'beauty filter',
   'distorted face', 'deformed face', 'extra limbs', 'missing fingers',
