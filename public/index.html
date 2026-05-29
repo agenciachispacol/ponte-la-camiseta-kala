@@ -18,7 +18,7 @@
   <!-- ══════════════════ NAVBAR ══════════════════ -->
   <nav class="navbar" id="navbar">
     <a href="#" class="navbar-brand">
-      <img src="https://colombiafintech.co/wp-content/uploads/2025/06/kala.png"
+      <img src="kala-white.png"
            alt="KALA" class="nav-logo" id="kala-logo-nav"
            onerror="this.style.display='none'; document.getElementById('kala-text-fallback').style.display='block'" />
       <span id="kala-text-fallback" class="nav-logo-text" style="display:none">KALA</span>
@@ -42,7 +42,7 @@
 
     <div class="hero-content">
       <div class="hero-eyebrow">
-        <img src="https://colombiafintech.co/wp-content/uploads/2025/06/kala.png"
+        <img src="kala-white.png"
              alt="KALA" class="hero-logo"
              onerror="this.outerHTML='<span class=\'hero-logo-text\'>KALA</span>'" />
         <span class="hero-eyebrow-sep">×</span>
@@ -51,7 +51,7 @@
 
       <h1 class="hero-title">
         PONTE LA <em class="hero-title-gold">CAMISETA</em>
-        <img src="https://colombiafintech.co/wp-content/uploads/2025/06/kala.png"
+        <img src="kala-white.png"
              alt="KALA" class="hero-title-logo"
              onerror="this.outerHTML='<span class=\'hero-title-gold\'>KALA</span>'" />
       </h1>
@@ -149,8 +149,24 @@
                 <path d="M40 6v10M35 10l5-5 5 5" stroke-linecap="round"/>
               </svg>
             </div>
-            <p class="upload-main">Arrastrá tu selfie aquí</p>
-            <p class="upload-sub">o hacé clic para seleccionar · JPG, PNG · máx 10MB</p>
+            <p class="upload-main">Subí tu selfie</p>
+            <p class="upload-sub">Arrastrala, elegí un archivo o usá la cámara · JPG, PNG · máx 10MB</p>
+
+            <div class="upload-btn-row">
+              <button type="button" class="upload-btn" onclick="event.stopPropagation(); triggerFileInput()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                Elegir foto
+              </button>
+              <button type="button" class="upload-btn cam" onclick="event.stopPropagation(); triggerCameraInput()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/>
+                </svg>
+                Tomar foto
+              </button>
+            </div>
+
             <div class="upload-tips-row">
               <span class="upload-tip">✓ Buena luz</span>
               <span class="upload-tip">✓ De frente</span>
@@ -168,7 +184,9 @@
             <div class="preview-change-hint">Clic para cambiar</div>
           </div>
 
-          <input type="file" id="selfie-input" accept="image/jpeg,image/png,image/webp"
+          <input type="file" id="selfie-input" accept="image/*"
+                 class="file-hidden" onchange="handleFileSelect(event)" />
+          <input type="file" id="selfie-camera" accept="image/*" capture="user"
                  class="file-hidden" onchange="handleFileSelect(event)" />
         </div>
 
@@ -286,7 +304,7 @@
             <div class="orb-ring r2"></div>
             <div class="orb-ring r3"></div>
             <div class="orb-core">
-              <img src="https://colombiafintech.co/wp-content/uploads/2025/06/kala.png"
+              <img src="kala-white.png"
                    alt="KALA" class="orb-logo"
                    onerror="this.outerHTML='<span class=\'orb-logo-text\'>K</span>'" />
             </div>
@@ -321,7 +339,7 @@
           <img id="result-img" src="" alt="Tu retrato KALA" class="result-img" />
           <div class="result-glow"></div>
           <div class="result-badge-overlay">
-            <img src="https://colombiafintech.co/wp-content/uploads/2025/06/kala.png"
+            <img src="kala-white.png"
                  alt="KALA" class="result-kala-badge"
                  onerror="this.outerHTML='<span class=\'result-kala-text\'>KALA</span>'" />
           </div>
@@ -370,7 +388,7 @@
 
   <!-- ══════════════════ FOOTER ══════════════════ -->
   <footer class="site-footer">
-    <img src="https://colombiafintech.co/wp-content/uploads/2025/06/kala.png"
+    <img src="kala-white.png"
          alt="KALA" class="footer-logo"
          onerror="this.outerHTML='<span class=\'footer-logo-text\'>KALA</span>'" />
     <p class="footer-copy">

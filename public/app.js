@@ -55,8 +55,8 @@ function initParticles() {
   resize();
   window.addEventListener('resize', resize, { passive: true });
 
-  const GOLD  = 'rgba(245,182,35,';
-  const GREEN = 'rgba(0,230,118,';
+  const GOLD  = 'rgba(27,109,245,';
+  const GREEN = 'rgba(34,211,255,';
 
   const particles = Array.from({ length: 55 }, () => ({
     x:     Math.random() * canvas.width,
@@ -151,6 +151,10 @@ function handleDrop(e) {
 
 function triggerFileInput() {
   document.getElementById('selfie-input').click();
+}
+
+function triggerCameraInput() {
+  document.getElementById('selfie-camera').click();
 }
 
 function handleFileSelect(e) {
@@ -464,6 +468,7 @@ function resetForm() {
 
   // Reset UI upload
   document.getElementById('selfie-input').value = '';
+  document.getElementById('selfie-camera').value = '';
   document.getElementById('preview-img').src = '';
   document.getElementById('upload-empty').classList.remove('hidden');
   document.getElementById('upload-preview').classList.add('hidden');

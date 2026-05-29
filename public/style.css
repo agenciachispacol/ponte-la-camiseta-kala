@@ -235,11 +235,12 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
 
 .hero-title-logo {
   display:   block;
-  margin:    18px auto 0;
-  height:    clamp(46px, 8.5vw, 88px);
+  margin:    16px auto 0;
+  height:    clamp(54px, 10vw, 96px);
+  max-width: 92%;
   width:     auto;
-  filter:    brightness(0) invert(1)
-             drop-shadow(0 0 26px rgba(27,109,245,0.6))
+  object-fit: contain;
+  filter:    drop-shadow(0 0 28px rgba(27,109,245,0.65))
              drop-shadow(0 2px 20px rgba(0,0,0,0.7));
 }
 
@@ -454,7 +455,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
 /* Done */
 .step-dot.done .sdot-circle {
   border-color: var(--green);
-  background:   rgba(0,230,118,0.12);
+  background:   rgba(34,211,255,0.12);
 }
 .step-dot.done .sdot-num { display: none; }
 .step-dot.done .sdot-check { opacity: 1; color: var(--green); }
@@ -625,7 +626,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   bottom:         12px;
   left:           50%;
   transform:      translateX(-50%);
-  background:     rgba(0,230,118,0.9);
+  background:     rgba(34,211,255,0.9);
   color:          var(--bg-0);
   font-size:      12px;
   font-weight:    700;
@@ -656,13 +657,48 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
 
 .upload-preview:hover .preview-change-hint { opacity: 1; }
 
-.file-hidden {
-  position: absolute;
-  inset:    0;
-  opacity:  0;
-  cursor:   pointer;
-  z-index:  2;
+.file-hidden { display: none; }
+
+/* Botones subir / cámara */
+.upload-btn-row {
+  display:        flex;
+  gap:            12px;
+  flex-wrap:      wrap;
+  justify-content: center;
+  margin-top:     14px;
 }
+
+.upload-btn {
+  display:        inline-flex;
+  align-items:    center;
+  gap:            8px;
+  font-family:    var(--font);
+  font-size:      14px;
+  font-weight:    700;
+  color:          var(--white);
+  background:     rgba(27,109,245,0.12);
+  border:         1px solid rgba(27,109,245,0.35);
+  padding:        11px 20px;
+  border-radius:  999px;
+  cursor:         pointer;
+  transition:     background 0.2s, border-color 0.2s, transform 0.15s;
+}
+
+.upload-btn svg { width: 18px; height: 18px; stroke: var(--gold-light); }
+
+.upload-btn:hover {
+  background:     rgba(27,109,245,0.22);
+  border-color:   var(--gold);
+  transform:      translateY(-1px);
+}
+
+.upload-btn.cam {
+  background:   linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+  border-color: transparent;
+  color:        #fff;
+}
+.upload-btn.cam svg { stroke: #fff; }
+.upload-btn.cam:hover { box-shadow: 0 6px 20px rgba(27,109,245,0.45); }
 
 /* Error */
 .upload-error {
@@ -932,7 +968,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
 .r3 {
   inset:            24px;
   border-bottom-color: var(--green);
-  border-right-color: rgba(0,230,118,0.2);
+  border-right-color: rgba(34,211,255,0.2);
   animation-duration: 3s;
 }
 
