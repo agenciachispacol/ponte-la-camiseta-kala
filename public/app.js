@@ -247,6 +247,31 @@ function selectGender(genero, btn) {
 }
 
 /* ═══════════════════════════════════════════════
+   CONSENTIMIENTO + PRIVACIDAD
+   ═══════════════════════════════════════════════ */
+function toggleConsent() {
+  const ok = document.getElementById('consent-check').checked;
+  document.getElementById('btn-generate').disabled = !ok;
+}
+
+function openPrivacy() {
+  document.getElementById('privacy-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePrivacy() {
+  document.getElementById('privacy-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function acceptPrivacy() {
+  const chk = document.getElementById('consent-check');
+  chk.checked = true;
+  toggleConsent();
+  closePrivacy();
+}
+
+/* ═══════════════════════════════════════════════
    SLIDERS
    ═══════════════════════════════════════════════ */
 function syncSlider(sliderId, labelId, unit) {
@@ -315,6 +340,11 @@ async function generateImage() {
   if (!state.selfieBase64) {
     alert('Por favor sube una selfie primero.');
     goStep(1);
+    return;
+  }
+
+  if (!document.getElementById('consent-check').checked) {
+    alert('Debes autorizar el tratamiento de datos para generar tu retrato.');
     return;
   }
 
@@ -524,6 +554,11 @@ function resetForm() {
   document.getElementById('upload-preview').classList.add('hidden');
   document.getElementById('btn-step1').disabled = true;
   hideUploadError();
+
+  // Reset consentimiento
+  const consent = document.getElementById('consent-check');
+  if (consent) consent.checked = false;
+  document.getElementById('btn-generate').disabled = true;
 
   // Reset step indicators
   ['sdot-1','sdot-2','sdot-3'].forEach((id, i) => {

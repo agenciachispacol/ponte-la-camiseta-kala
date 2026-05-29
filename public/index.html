@@ -281,6 +281,16 @@
 
         </div>
 
+        <!-- Consentimiento de datos -->
+        <label class="consent-row" for="consent-check">
+          <input type="checkbox" id="consent-check" onchange="toggleConsent()" />
+          <span class="consent-box"></span>
+          <span class="consent-text">
+            Autorizo a KALA el tratamiento de mi foto y datos físicos para generar mi retrato,
+            conforme a la <button type="button" class="consent-link" onclick="event.preventDefault(); openPrivacy()">Política de Privacidad</button>.
+          </span>
+        </label>
+
         <div class="card-actions two">
           <button class="btn-secondary" onclick="goStep(1)" type="button">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -288,7 +298,7 @@
             </svg>
             Atrás
           </button>
-          <button class="btn-primary" id="btn-generate" onclick="generateImage()" type="button">
+          <button class="btn-primary" id="btn-generate" onclick="generateImage()" type="button" disabled>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
             </svg>
@@ -393,9 +403,37 @@
          alt="KALA" class="footer-logo"
          onerror="this.outerHTML='<span class=\'footer-logo-text\'>KALA</span>'" />
     <p class="footer-copy">
-      © 2025 KALA · Campaña <em>Ponte la Camiseta</em> · <strong>#SoyKala</strong>
+      © 2026 KALA · Campaña <em>Ponte la Camiseta</em> · <strong>#SoyKala</strong>
     </p>
+    <button type="button" class="footer-link" onclick="openPrivacy()">Política de Privacidad y Tratamiento de Datos</button>
   </footer>
+
+  <!-- ══════════════════ MODAL PRIVACIDAD ══════════════════ -->
+  <div class="privacy-overlay" id="privacy-overlay" onclick="if(event.target===this) closePrivacy()">
+    <div class="privacy-modal" role="dialog" aria-modal="true" aria-labelledby="privacy-title">
+      <button type="button" class="privacy-close" onclick="closePrivacy()" aria-label="Cerrar">×</button>
+      <h2 class="privacy-title" id="privacy-title">Política de Privacidad y Tratamiento de Datos</h2>
+      <div class="privacy-body">
+        <p>En el marco de la campaña <strong>“Ponte la camiseta KALA” (#SoyKala)</strong>, KALA actúa como responsable del tratamiento de tus datos conforme a la Ley 1581 de 2012 y demás normas colombianas de protección de datos personales (Habeas Data).</p>
+
+        <h3>¿Qué datos recolectamos?</h3>
+        <p>La fotografía (selfie) que subes y los datos físicos que ingresas: género, estatura y peso.</p>
+
+        <h3>¿Para qué los usamos?</h3>
+        <p>Únicamente para generar tu retrato deportivo con la camiseta KALA. Tu foto se procesa de forma automatizada a través de un proveedor tecnológico de generación de imágenes y <strong>no se almacena de forma permanente</strong> en nuestros servidores: se usa solo durante la generación y se descarta.</p>
+
+        <h3>Participación en la campaña</h3>
+        <p>Si compartes tu retrato en redes sociales con el hashtag <strong>#SoyKala</strong>, esa publicación es pública y se rige por los términos de la red social correspondiente. La mecánica y premios de la campaña se rigen por los términos y condiciones de KALA.</p>
+
+        <h3>Tus derechos</h3>
+        <p>Puedes conocer, actualizar, rectificar y solicitar la supresión de tus datos, así como revocar esta autorización, escribiéndonos a <strong>contacto@kala.com</strong>.</p>
+
+        <h3>Autorización</h3>
+        <p>Al marcar la casilla y generar tu retrato, autorizas de manera libre, previa, expresa e informada el tratamiento de tus datos para los fines aquí descritos.</p>
+      </div>
+      <button type="button" class="btn-primary privacy-accept" onclick="acceptPrivacy()">Entendido</button>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>
