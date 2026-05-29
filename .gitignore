@@ -15,3 +15,8 @@ npm-debug.log*
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Imágenes fuente originales en la raíz (ya copiadas en refs/)
+/balon.jpeg
+/camiseta kala.jpeg
+/logo kala blanco.png

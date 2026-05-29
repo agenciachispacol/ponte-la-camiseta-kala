@@ -470,14 +470,14 @@ async function downloadImage() {
    ═══════════════════════════════════════════════ */
 function shareWhatsApp() {
   const text = encodeURIComponent(
-    '¡Mirá mi retrato deportivo oficial KALA generado con IA! 🏟️⚽ #PonteLaCamisetaKALA'
+    '¡Hice mi retrato deportivo con IA y ya tengo la camiseta puesta! 🏟️⚽ Yo #SoyKala'
   );
   window.open(`https://wa.me/?text=${text}`, '_blank');
 }
 
 function shareTwitter() {
   const text = encodeURIComponent(
-    '¡Me puse la camiseta KALA con IA! 🏟️⚽ #PonteLaCamisetaKALA #KALA'
+    'Me puse la camiseta y armé mi retrato con IA 🏟️⚽🔥 Yo #SoyKala'
   );
   window.open(`https://x.com/intent/tweet?text=${text}`, '_blank');
 }
@@ -485,7 +485,7 @@ function shareTwitter() {
 function shareInstagram() {
   // Instagram no permite share directo vía URL — mostrar instrucción
   downloadImage().then(() => {
-    alert('📲 Imagen descargada.\nAbrí Instagram y subila desde tu galería con #PonteLaCamisetaKALA');
+    alert('📲 Imagen descargada.\nSubila a tu feed o historias y etiquetá con #SoyKala');
   });
 }
 
