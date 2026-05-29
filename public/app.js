@@ -350,7 +350,7 @@ async function generateImage() {
 let loadingTimer = null;
 
 const LOAD_STEPS = [
-  { id: 'lc-1', msg: 'Analizando rasgos faciales con Gemini 3 Pro Image...',  pct: 15,  delay: 0    },
+  { id: 'lc-1', msg: 'Analizando tu rostro...',                                 pct: 15,  delay: 0    },
   { id: 'lc-2', msg: 'Calculando complexión corporal...',                       pct: 35,  delay: 3500 },
   { id: 'lc-3', msg: 'Construyendo prompt especializado KALA...',               pct: 55,  delay: 7000 },
   { id: 'lc-4', msg: 'Renderizando retrato hiperrealista...',                   pct: 80,  delay: 12000},
@@ -470,14 +470,14 @@ async function downloadImage() {
    ═══════════════════════════════════════════════ */
 function shareWhatsApp() {
   const text = encodeURIComponent(
-    '¡Hice mi retrato deportivo con IA y ya tengo la camiseta puesta! 🏟️⚽ Yo #SoyKala'
+    '¡Ya tengo la camiseta KALA puesta y armé mi retrato deportivo! 🏟️⚽ Yo #SoyKala'
   );
   window.open(`https://wa.me/?text=${text}`, '_blank');
 }
 
 function shareTwitter() {
   const text = encodeURIComponent(
-    'Me puse la camiseta y armé mi retrato con IA 🏟️⚽🔥 Yo #SoyKala'
+    'Me puse la camiseta KALA y armé mi retrato deportivo 🏟️⚽🔥 Yo #SoyKala'
   );
   window.open(`https://x.com/intent/tweet?text=${text}`, '_blank');
 }
