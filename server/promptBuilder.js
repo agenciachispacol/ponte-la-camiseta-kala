@@ -21,8 +21,9 @@ look. The result must be unmistakably the SAME individual — as if this real pe
 the photo. DO NOT beautify, slim the face, change age, swap to a different or "ideal" face,
 or turn them into a model. Preserve their real, recognizable face above everything else.
 
-FRAMING: Waist-up to three-quarter body shot. The face is clearly visible, well lit and large
-enough to be fully recognizable. Sharp focus on the face.
+FRAMING: Upper-body / chest-up portrait. The head and face fill a large portion of the frame
+and are sharp, well lit and fully recognizable. The KALA jersey logo stays visible on the
+chest. The person holds the ball up near the chest or shoulder so it remains in frame.
 
 SETTING: Packed nighttime football stadium, Colombia, dramatic stadium floodlights,
 electric green pitch in the background, crowd blurred in cool blue bokeh, subtle haze,
@@ -34,8 +35,8 @@ small navy "k" logo on the upper right chest, V-neck with subtle navy trim. Repr
 jersey design, colors and logo placement EXACTLY. Real fabric texture, natural fit, not CGI.
 
 BALL: The person holds the official match ball from the BALL REFERENCE image — an adidas
-TRIONDA ball, white base with vivid multicolor panels (red, green, blue). Held at waist
-height or under one arm. Reproduce its pattern and colors EXACTLY.
+TRIONDA ball, white base with vivid multicolor panels (red, green, blue). Held up near the
+chest or shoulder so it stays in frame. Reproduce its pattern and colors EXACTLY.
 
 {SECCION_BODY}
 
@@ -45,6 +46,11 @@ fashion model pose.
 LIGHTING & QUALITY: Cinematic stadium lighting, soft key light on the face so it stays clearly
 recognizable, gentle rim light. Ultra-realistic photograph, natural skin texture with visible
 pores, no plastic/over-smoothed skin, correct hand anatomy, photojournalistic quality.
+
+FINAL AND MOST IMPORTANT INSTRUCTION: The generated face MUST be the SAME person as the FACE
+REFERENCE image — copy their real face faithfully (same proportions, features and expression
+character), fully recognizable as that individual. Facial likeness to the reference photo
+takes priority over pose, lighting and style.
 `.trim();
 
 // ─────────────────────────────────────────────

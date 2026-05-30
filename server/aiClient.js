@@ -173,24 +173,16 @@ async function generatePortrait({ positivePrompt, negativePrompt, faceImage }) {
 
   console.log(`[AI] Provider: ${provider} | Modelo: ${provider === 'openai' ? 'gpt-image-2' : 'gemini-3-pro-image'}`);
 
-  // PASO 1 — Analizar cara
-  let faceDescription = '';
-  try {
-    if (faceImage) faceDescription = await analyzeFace(faceImage);
-  } catch (err) {
-    console.warn('[AI] Análisis facial falló (continúa sin él):', err.message);
-  }
-
-  let enrichedPrompt = faceDescription
-    ? `${positivePrompt}\n\nFACE PRECISE DESCRIPTION FROM REFERENCE PHOTO (use to match identity, the reference IMAGE is the source of truth): ${faceDescription}`
-    : positivePrompt;
+  // Para máxima fidelidad facial NO inyectamos una descripción textual de la cara
+  // (tiende a "promediar" el rostro): la foto de referencia es la fuente de verdad.
+  let enrichedPrompt = positivePrompt;
 
   // Gemini no tiene parámetro de negativos: se incluyen como línea AVOID en el texto.
   if (negativePrompt) {
     enrichedPrompt += `\n\nAVOID: ${negativePrompt}.`;
   }
 
-  // PASO 2 — Generar imagen
+  // Generar imagen
   if (provider === 'openai') {
     return generateWithGPTImage2(enrichedPrompt);
   }
