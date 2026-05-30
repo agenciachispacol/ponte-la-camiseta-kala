@@ -158,20 +158,14 @@
               </svg>
             </div>
             <p class="upload-main">Sube tu selfie</p>
-            <p class="upload-sub">Arrástrala, elige un archivo o usa la cámara · JPG, PNG · máx 10MB</p>
+            <p class="upload-sub">Toca para elegir de la galería o tomar una foto · JPG, PNG · máx 10MB</p>
 
             <div class="upload-btn-row">
-              <button type="button" class="upload-btn" onclick="event.stopPropagation(); triggerFileInput()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
-                </svg>
-                Elegir foto
-              </button>
-              <button type="button" class="upload-btn cam" onclick="event.stopPropagation(); triggerCameraInput()">
+              <button type="button" class="upload-btn cam" onclick="event.stopPropagation(); triggerFileInput()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/>
                 </svg>
-                Tomar foto
+                Subir foto
               </button>
             </div>
 
@@ -193,8 +187,6 @@
           </div>
 
           <input type="file" id="selfie-input" accept="image/*"
-                 class="file-hidden" onchange="handleFileSelect(event)" />
-          <input type="file" id="selfie-camera" accept="image/*" capture="user"
                  class="file-hidden" onchange="handleFileSelect(event)" />
         </div>
 
