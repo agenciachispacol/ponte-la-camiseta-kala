@@ -524,17 +524,33 @@ async function downloadImage() {
    SHARE
    ═══════════════════════════════════════════════ */
 
+/** Devuelve el retrato generado como Blob. */
+async function getResultBlob() {
+  if (!state.resultImageUrl) return null;
+  return (await fetch(state.resultImageUrl)).blob();
+}
+
+/** Dispara una descarga local del blob. */
+function triggerDownload(blob) {
+  const objURL = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = objURL;
+  a.download = `kala-soykala-${Date.now()}.jpg`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(objURL);
+}
+
 /**
- * Intenta compartir la imagen ADJUNTA usando el menú nativo del teléfono
- * (ahí el usuario elige WhatsApp, Instagram, etc. y la foto va incluida).
- * @returns {Promise<boolean>} true si se compartió o el usuario canceló;
- *                              false si el dispositivo no soporta adjuntar.
+ * MÓVIL: comparte la imagen ADJUNTA con el menú nativo del teléfono
+ * (el usuario elige WhatsApp, Instagram, etc. y la foto va incluida).
+ * @returns {Promise<boolean>} true si se compartió o el usuario canceló.
  */
 async function shareImageNative(text) {
-  const url = state.resultImageUrl;
-  if (!url) return false;
   try {
-    const blob = await (await fetch(url)).blob();
+    const blob = await getResultBlob();
+    if (!blob) return false;
     const file = new File([blob], `kala-soykala-${Date.now()}.jpg`, { type: blob.type || 'image/jpeg' });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       try {
@@ -551,28 +567,36 @@ async function shareImageNative(text) {
   return false;
 }
 
+/** ESCRITORIO: descarga la foto y abre la red con el texto, para adjuntarla. */
+async function desktopShareFallback(openUrl) {
+  try {
+    const blob = await getResultBlob();
+    if (blob) triggerDownload(blob);
+  } catch (_) {}
+  window.open(openUrl, '_blank');
+  setTimeout(() => {
+    alert('💡 En la computadora descargamos tu foto.\nAdjúntala en la ventana que se abrió y publica con #SoyKala.');
+  }, 400);
+}
+
 async function shareWhatsApp() {
   const text = '¡Ya tengo la camiseta KALA puesta! Esta es mi nueva foto de perfil 🏟️⚽ Yo #SoyKala';
-  // Móvil: compartir con la FOTO adjunta (elige WhatsApp en el menú)
-  if (await shareImageNative(text)) return;
-  // Escritorio: solo texto (WhatsApp web no permite adjuntar por link)
-  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  if (await shareImageNative(text)) return;                       // móvil: foto adjunta
+  await desktopShareFallback(`https://wa.me/?text=${encodeURIComponent(text)}`); // PC
 }
 
 async function shareTwitter() {
   const text = 'Me puse la camiseta KALA y esta es mi nueva foto de perfil 🏟️⚽🔥 Yo #SoyKala';
   if (await shareImageNative(text)) return;
-  window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+  await desktopShareFallback(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`);
 }
 
 async function shareInstagram() {
   const text = 'Yo #SoyKala ⚽🏟️';
-  // Instagram no recibe imagen por link: el compartir nativo es la mejor vía
   if (await shareImageNative(text)) return;
-  // Escritorio: descargar y guiar
-  downloadImage().then(() => {
-    alert('📲 Imagen descargada.\nSúbela a tu feed o historias con #SoyKala para participar por el premio.');
-  });
+  // Instagram no tiene "subir por web": en PC descargamos y guiamos
+  try { const blob = await getResultBlob(); if (blob) triggerDownload(blob); } catch (_) {}
+  alert('📲 Descargamos tu foto.\nSúbela a tu feed o historias de Instagram con #SoyKala para participar por el premio.');
 }
 
 /* ═══════════════════════════════════════════════
