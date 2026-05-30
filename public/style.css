@@ -558,22 +558,106 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
 
 .upload-empty { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
-.upload-icon-ring {
+/* Contenedor de animación guía */
+.upload-anim {
+  position:        relative;
+  width:           120px;
+  height:          120px;
+  margin-bottom:   6px;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+}
+
+/* Anillos "toca aquí" (sonar) */
+.pulse-ring {
+  position:      absolute;
   width:         80px;
   height:        80px;
   border-radius: 50%;
-  background:    rgba(27,109,245,0.08);
-  border:        2px solid rgba(27,109,245,0.2);
+  border:        2px solid var(--gold);
+  opacity:       0;
+  animation:     sonar 2.6s ease-out infinite;
+  pointer-events: none;
+}
+.pulse-ring.d2 { animation-delay: 1.3s; }
+
+@keyframes sonar {
+  0%   { transform: scale(0.55); opacity: 0.6; }
+  100% { transform: scale(1.6);  opacity: 0;   }
+}
+
+.upload-icon-ring {
+  position:      relative;
+  z-index:       2;
+  width:         80px;
+  height:        80px;
+  border-radius: 50%;
+  background:    rgba(27,109,245,0.10);
+  border:        2px solid rgba(27,109,245,0.30);
   display:       flex;
   align-items:   center;
   justify-content: center;
-  margin-bottom: 8px;
+  animation:     floatY 3s ease-in-out infinite;
+}
+
+@keyframes floatY {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-7px); }
 }
 
 .upload-icon-ring svg {
   width:  44px;
   height: 44px;
   color:  var(--gold);
+}
+
+/* Flecha "subir" que rebota */
+.up-arrow {
+  transform-box:    fill-box;
+  transform-origin: center;
+  animation:        arrowBob 1.6s ease-in-out infinite;
+}
+@keyframes arrowBob {
+  0%,100% { transform: translateY(1px);  opacity: 0.55; }
+  50%     { transform: translateY(-2px); opacity: 1;    }
+}
+
+/* Marco de encuadre (centra tu cara) */
+.fbrk {
+  position: absolute;
+  width:    18px;
+  height:   18px;
+  border:   3px solid var(--gold-light);
+  z-index:  1;
+  opacity:  0.3;
+  animation: brkPulse 2.6s ease-in-out infinite;
+}
+.fbrk.tl { top: 6px;    left: 6px;    border-right: none; border-bottom: none; border-top-left-radius: 6px; }
+.fbrk.tr { top: 6px;    right: 6px;   border-left: none;  border-bottom: none; border-top-right-radius: 6px; }
+.fbrk.bl { bottom: 6px; left: 6px;    border-right: none; border-top: none;    border-bottom-left-radius: 6px; }
+.fbrk.br { bottom: 6px; right: 6px;   border-left: none;  border-top: none;    border-bottom-right-radius: 6px; }
+
+@keyframes brkPulse {
+  0%,100% { opacity: 0.25; transform: scale(1); }
+  50%     { opacity: 0.85; transform: scale(1.08); }
+}
+
+/* Dedo que toca */
+.tap-finger {
+  position:  absolute;
+  right:     14px;
+  bottom:    8px;
+  z-index:   3;
+  font-size: 30px;
+  filter:    drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  animation: tapBob 1.8s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes tapBob {
+  0%,100% { transform: translate(0,0) scale(1); }
+  45%     { transform: translate(-6px,-8px) scale(0.82); }
+  60%     { transform: translate(-6px,-8px) scale(0.82); }
 }
 
 .upload-main {
@@ -603,6 +687,23 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   background:  var(--green-dim);
   padding:     3px 10px;
   border-radius: 999px;
+  animation:   tipGlow 3.6s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * 1.2s);
+}
+
+@keyframes tipGlow {
+  0%, 22%, 100% { transform: translateY(0); box-shadow: none; filter: none; }
+  8%            { transform: translateY(-3px);
+                  box-shadow: 0 4px 14px rgba(34,211,255,0.35);
+                  filter: brightness(1.25); }
+}
+
+/* Accesibilidad: respeta usuarios que prefieren menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+  .pulse-ring, .upload-icon-ring, .up-arrow, .fbrk, .tap-finger, .upload-tip {
+    animation: none !important;
+  }
+  .fbrk { opacity: 0.6; }
 }
 
 /* Preview */

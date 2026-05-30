@@ -150,20 +150,33 @@
 
           <!-- Estado vacío -->
           <div class="upload-empty" id="upload-empty">
-            <div class="upload-icon-ring">
-              <svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5">
-                <circle cx="40" cy="34" r="14" />
-                <path d="M10 72c0-16.569 13.431-30 30-30s30 13.431 30 30" />
-                <path d="M40 6v10M35 10l5-5 5 5" stroke-linecap="round"/>
-              </svg>
+            <div class="upload-anim">
+              <span class="pulse-ring"></span>
+              <span class="pulse-ring d2"></span>
+
+              <!-- marco de encuadre (centra tu cara) -->
+              <span class="fbrk tl"></span><span class="fbrk tr"></span>
+              <span class="fbrk bl"></span><span class="fbrk br"></span>
+
+              <div class="upload-icon-ring">
+                <svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <circle cx="40" cy="34" r="14" />
+                  <path d="M10 72c0-16.569 13.431-30 30-30s30 13.431 30 30" />
+                  <path class="up-arrow" d="M40 6v10M35 10l5-5 5 5" stroke-linecap="round"/>
+                </svg>
+              </div>
+
+              <!-- dedo que toca -->
+              <span class="tap-finger" aria-hidden="true">👆</span>
             </div>
+
             <p class="upload-main">Sube tu selfie</p>
             <p class="upload-sub">Toca aquí para elegir de la galería o tomar una foto · JPG, PNG · máx 10MB</p>
 
             <div class="upload-tips-row">
-              <span class="upload-tip">✓ Buena luz</span>
-              <span class="upload-tip">✓ De frente</span>
-              <span class="upload-tip">✓ Sin lentes</span>
+              <span class="upload-tip" style="--i:0">✓ Buena luz</span>
+              <span class="upload-tip" style="--i:1">✓ De frente</span>
+              <span class="upload-tip" style="--i:2">✓ Sin lentes</span>
             </div>
           </div>
 
