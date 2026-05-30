@@ -202,6 +202,27 @@
           <span id="upload-error-msg">Por favor sube una imagen válida.</span>
         </div>
 
+        <!-- Consejos para la foto -->
+        <div class="photo-tips">
+          <p class="photo-tips-title">📸 Para que el retrato salga idéntico a ti</p>
+          <div class="photo-tips-grid">
+            <ul class="tips-col do">
+              <li>Luz clara sobre tu cara</li>
+              <li>Mirando de frente a la cámara</li>
+              <li>Cara centrada y cerca (hombros hacia arriba)</li>
+              <li>Expresión neutral o sonrisa leve</li>
+              <li>Fondo simple</li>
+            </ul>
+            <ul class="tips-col dont">
+              <li>Gafas de sol, gorra o tapabocas</li>
+              <li>Fotos de lejos o de perfil</li>
+              <li>Filtros, mucho maquillaje o edición</li>
+              <li>Más de una persona en la foto</li>
+              <li>Foto borrosa, oscura o a contraluz</li>
+            </ul>
+          </div>
+        </div>
+
         <div class="card-actions">
           <button class="btn-primary" id="btn-step1" onclick="goStep(2)" disabled>
             Continuar
@@ -289,8 +310,9 @@
           <input type="checkbox" id="consent-check" onchange="toggleConsent()" />
           <span class="consent-box"></span>
           <span class="consent-text">
-            Autorizo a KALA el tratamiento de mi foto y datos físicos para generar mi retrato,
-            conforme a la <button type="button" class="consent-link" onclick="event.preventDefault(); openPrivacy()">Política de Privacidad</button>.
+            Autorizo a KALA el tratamiento de mi foto y datos físicos, y el
+            <strong>uso de mi imagen</strong> para generar y difundir mi retrato en la campaña
+            #SoyKala, conforme a la <button type="button" class="consent-link" onclick="event.preventDefault(); openPrivacy()">Política de Privacidad</button>.
           </span>
         </label>
 
@@ -426,6 +448,9 @@
         <h3>¿Para qué los usamos?</h3>
         <p>Únicamente para generar tu retrato deportivo con la camiseta KALA. Tu foto se procesa de forma automatizada a través de un proveedor tecnológico de generación de imágenes y <strong>no se almacena de forma permanente</strong> en nuestros servidores: se usa solo durante la generación y se descarta.</p>
 
+        <h3>Autorización de uso de imagen</h3>
+        <p>Autorizas de forma voluntaria y gratuita a KALA para usar, reproducir y difundir el retrato generado con tu imagen (rostro y semejanza) en las piezas y canales de la campaña <strong>#SoyKala</strong> —redes sociales, sitio web y material promocional— durante la vigencia de la campaña. Esta autorización no genera contraprestación económica y puedes revocarla en cualquier momento escribiéndonos.</p>
+
         <h3>Participación en la campaña</h3>
         <p>Si compartes tu retrato en redes sociales con el hashtag <strong>#SoyKala</strong>, esa publicación es pública y se rige por los términos de la red social correspondiente. La mecánica y premios de la campaña se rigen por los términos y condiciones de KALA.</p>
 
@@ -433,7 +458,7 @@
         <p>Puedes conocer, actualizar, rectificar y solicitar la supresión de tus datos, así como revocar esta autorización, escribiéndonos a <strong>contacto@kala.com</strong>.</p>
 
         <h3>Autorización</h3>
-        <p>Al marcar la casilla y generar tu retrato, autorizas de manera libre, previa, expresa e informada el tratamiento de tus datos para los fines aquí descritos.</p>
+        <p>Al marcar la casilla y generar tu retrato, autorizas de manera libre, previa, expresa e informada el tratamiento de tus datos y el uso de tu imagen para los fines aquí descritos.</p>
       </div>
       <button type="button" class="btn-primary privacy-accept" onclick="acceptPrivacy()">Entendido</button>
     </div>

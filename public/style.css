@@ -706,6 +706,52 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   .fbrk { opacity: 0.6; }
 }
 
+/* Consejos para la foto */
+.photo-tips {
+  margin:        18px 0 4px;
+  padding:       16px 18px;
+  border:        1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  background:    rgba(27,109,245,0.05);
+}
+
+.photo-tips-title {
+  font-size:     14px;
+  font-weight:   700;
+  color:         var(--white);
+  margin-bottom: 12px;
+}
+
+.photo-tips-grid {
+  display:               grid;
+  grid-template-columns: 1fr 1fr;
+  gap:                   10px 22px;
+}
+
+.tips-col { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+
+.tips-col li {
+  position:    relative;
+  padding-left: 24px;
+  font-size:   12.5px;
+  line-height: 1.35;
+  color:       var(--white-70);
+}
+
+.tips-col li::before {
+  position:    absolute;
+  left:        0; top: -1px;
+  font-size:   14px;
+  font-weight: 800;
+}
+
+.tips-col.do   li::before { content: '✓'; color: var(--green); }
+.tips-col.dont li::before { content: '✕'; color: #FF5A6E; }
+
+@media (max-width: 520px) {
+  .photo-tips-grid { grid-template-columns: 1fr; gap: 8px; }
+}
+
 /* Preview */
 .upload-preview {
   position:   relative;
