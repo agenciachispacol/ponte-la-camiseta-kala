@@ -523,24 +523,55 @@ async function downloadImage() {
 /* ═══════════════════════════════════════════════
    SHARE
    ═══════════════════════════════════════════════ */
-function shareWhatsApp() {
-  const text = encodeURIComponent(
-    '¡Ya tengo la camiseta KALA puesta! Esta es mi nueva foto de perfil 🏟️⚽ Yo #SoyKala'
-  );
-  window.open(`https://wa.me/?text=${text}`, '_blank');
+
+/**
+ * Intenta compartir la imagen ADJUNTA usando el menú nativo del teléfono
+ * (ahí el usuario elige WhatsApp, Instagram, etc. y la foto va incluida).
+ * @returns {Promise<boolean>} true si se compartió o el usuario canceló;
+ *                              false si el dispositivo no soporta adjuntar.
+ */
+async function shareImageNative(text) {
+  const url = state.resultImageUrl;
+  if (!url) return false;
+  try {
+    const blob = await (await fetch(url)).blob();
+    const file = new File([blob], `kala-soykala-${Date.now()}.jpg`, { type: blob.type || 'image/jpeg' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], text, title: 'PONTE LA CAMISETA KALA' });
+      } catch (err) {
+        if (err && err.name === 'AbortError') return true; // canceló: no abrir fallback
+        throw err;
+      }
+      return true;
+    }
+  } catch (err) {
+    console.warn('[APP] Share nativo no disponible:', err.message);
+  }
+  return false;
 }
 
-function shareTwitter() {
-  const text = encodeURIComponent(
-    'Me puse la camiseta KALA y esta es mi nueva foto de perfil 🏟️⚽🔥 Yo #SoyKala'
-  );
-  window.open(`https://x.com/intent/tweet?text=${text}`, '_blank');
+async function shareWhatsApp() {
+  const text = '¡Ya tengo la camiseta KALA puesta! Esta es mi nueva foto de perfil 🏟️⚽ Yo #SoyKala';
+  // Móvil: compartir con la FOTO adjunta (elige WhatsApp en el menú)
+  if (await shareImageNative(text)) return;
+  // Escritorio: solo texto (WhatsApp web no permite adjuntar por link)
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
 }
 
-function shareInstagram() {
-  // Instagram no permite share directo vía URL — mostrar instrucción
+async function shareTwitter() {
+  const text = 'Me puse la camiseta KALA y esta es mi nueva foto de perfil 🏟️⚽🔥 Yo #SoyKala';
+  if (await shareImageNative(text)) return;
+  window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+}
+
+async function shareInstagram() {
+  const text = 'Yo #SoyKala ⚽🏟️';
+  // Instagram no recibe imagen por link: el compartir nativo es la mejor vía
+  if (await shareImageNative(text)) return;
+  // Escritorio: descargar y guiar
   downloadImage().then(() => {
-    alert('📲 Imagen descargada.\nPonla de foto de perfil y súbela a tu feed o historias con #SoyKala para participar por el premio.');
+    alert('📲 Imagen descargada.\nSúbela a tu feed o historias con #SoyKala para participar por el premio.');
   });
 }
 
