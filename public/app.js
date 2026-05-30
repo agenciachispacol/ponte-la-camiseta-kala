@@ -376,10 +376,10 @@ async function generateImage() {
     finishLoadingAnimation(() => showResult(imageUrl));
 
   } catch (err) {
-    console.error('[APP] Error:', err);
+    console.error('[APP] Error:', err); // detalle técnico solo en consola
     stopLoadingAnimation();
     goStep(2); // volver a datos
-    alert(`❌ ${err.message}\n\nVerificá tu conexión o configuración de API.`);
+    alert('😕 No pudimos crear tu retrato en este momento.\n\nIntenta de nuevo en unos segundos. Si vuelve a pasar, prueba con otra foto bien iluminada, de frente y sin gafas.');
   }
 }
 
