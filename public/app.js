@@ -477,29 +477,45 @@ async function downloadImage() {
   const url = state.resultImageUrl;
   if (!url) return;
 
-  try {
-    const btn = document.getElementById('btn-download');
-    btn.textContent = 'Descargando...';
+  const btn = document.getElementById('btn-download');
+  const original = btn.innerHTML;
 
+  try {
     const response = await fetch(url);
     const blob     = await response.blob();
-    const objURL   = URL.createObjectURL(blob);
+    const fileName = `kala-soykala-${Date.now()}.jpg`;
+    const file     = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
 
-    const a    = document.createElement('a');
-    a.href     = objURL;
-    a.download = `kala-retrato-${Date.now()}.jpg`;
+    // ── MÓVIL: compartir nativo → permite "Guardar imagen" en la galería ──
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: 'PONTE LA CAMISETA KALA',
+          text:  'Yo #SoyKala ⚽🏟️',
+        });
+      } catch (shareErr) {
+        // El usuario canceló el menú de compartir → no es error
+        if (shareErr && shareErr.name === 'AbortError') return;
+        throw shareErr;
+      }
+      return;
+    }
+
+    // ── ESCRITORIO: descarga clásica ──
+    const objURL = URL.createObjectURL(blob);
+    const a      = document.createElement('a');
+    a.href       = objURL;
+    a.download   = fileName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(objURL);
 
-    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:20px;height:20px"><polyline points="20 6 9 17 4 12"/></svg> ¡Descargado!`;
-    setTimeout(() => {
-      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:20px;height:20px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Descargar`;
-    }, 2500);
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:20px;height:20px"><polyline points="20 6 9 17 4 12"/></svg> ¡Listo!`;
+    setTimeout(() => { btn.innerHTML = original; }, 2500);
   } catch (err) {
     console.error('[APP] Download error:', err);
-    // Fallback: abrir en nueva pestaña
     window.open(url, '_blank');
   }
 }

@@ -1153,6 +1153,15 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
 .btn-download svg { width: 20px; height: 20px; }
 .btn-download:hover { transform: translateY(-1px); box-shadow: 0 6px 36px rgba(27,109,245,0.5); }
 
+.download-hint {
+  margin-top: -6px;
+  font-size:  12px;
+  color:      var(--white-40);
+  text-align: center;
+  line-height: 1.4;
+}
+.download-hint strong { color: var(--white-70); }
+
 .share-row {
   display:     flex;
   align-items: center;
