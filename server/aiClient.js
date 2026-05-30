@@ -100,14 +100,10 @@ async function analyzeFace(faceImg) {
 }
 
 // ─────────────────────────────────────────────
-// PASO 2A — Gemini 3 Pro Image (generación)
+// Armado de las partes (selfie + camiseta + balón + prompt)
 // ─────────────────────────────────────────────
-async function generateWithGemini3(positivePrompt, faceImg) {
-  const genAI = geminiClient();
-  const model = genAI.getGenerativeModel({ model: 'gemini-3-pro-image' });
-
+function buildParts(positivePrompt, faceImg) {
   const parts = [];
-
   if (faceImg) {
     parts.push({ text: 'FACE REFERENCE — replicate this exact person\'s face and identity:' });
     parts.push(inlinePart(faceImg));
@@ -120,31 +116,97 @@ async function generateWithGemini3(positivePrompt, faceImg) {
     parts.push({ text: 'BALL REFERENCE — the person must hold THIS exact adidas TRIONDA match ball:' });
     parts.push(inlinePart(BALL_IMG));
   }
-
   parts.push({ text: positivePrompt });
-
-  const result = await model.generateContent({
-    contents: [{ role: 'user', parts }],
-    generationConfig: { responseModalities: ['IMAGE', 'TEXT'] },
-  });
-
-  const candidate = result.response.candidates?.[0];
-  if (!candidate) throw new Error('Gemini 3 Pro Image: no candidates in response.');
-
-  for (const part of candidate.content.parts) {
-    if (part.inlineData) {
-      return {
-        type:     'base64',
-        data:     part.inlineData.data,
-        mimeType: part.inlineData.mimeType || 'image/jpeg',
-      };
-    }
-  }
-  throw new Error('Gemini 3 Pro Image: no image part found in response.');
+  return parts;
 }
 
 // ─────────────────────────────────────────────
-// PASO 2B — GPT-image-2 (OpenAI alternativa)
+// Extracción DEFENSIVA de la imagen de la respuesta.
+// Devuelve el objeto imagen, o null si no hay imagen.
+// Lanza error claro si fue bloqueada por seguridad.
+// ─────────────────────────────────────────────
+function extractImageFromResponse(response) {
+  const block = response?.promptFeedback?.blockReason;
+  if (block) {
+    const e = new Error(`bloqueado por seguridad (${block})`);
+    e.blocked = true;
+    throw e;
+  }
+
+  const candidate = response?.candidates?.[0];
+  if (!candidate) return null;
+
+  const parts = candidate.content?.parts;
+  if (!Array.isArray(parts)) {
+    const fr = candidate.finishReason;
+    if (fr && fr !== 'STOP') {
+      const e = new Error(`respuesta sin imagen (finishReason: ${fr})`);
+      e.blocked = (fr === 'SAFETY' || fr === 'PROHIBITED_CONTENT');
+      throw e;
+    }
+    return null; // estructura inesperada → tratar como "sin imagen"
+  }
+
+  for (const part of parts) {
+    if (part?.inlineData?.data) {
+      return {
+        type:     'base64',
+        data:     part.inlineData.data,
+        mimeType: part.inlineData.mimeType || 'image/png',
+      };
+    }
+  }
+  return null;
+}
+
+// ─────────────────────────────────────────────
+// Gemini — un intento con un modelo concreto
+// ─────────────────────────────────────────────
+async function generateWithGeminiModel(positivePrompt, faceImg, modelId) {
+  const genAI = geminiClient();
+  const model = genAI.getGenerativeModel({ model: modelId });
+
+  const result = await model.generateContent({
+    contents: [{ role: 'user', parts: buildParts(positivePrompt, faceImg) }],
+    generationConfig: { responseModalities: ['IMAGE', 'TEXT'] },
+  });
+
+  const img = extractImageFromResponse(result.response);
+  if (!img) throw new Error(`${modelId}: respuesta sin imagen`);
+  return img;
+}
+
+// ─────────────────────────────────────────────
+// Gemini — cadena de modelos (fallback automático)
+// Configurable con GEMINI_IMAGE_MODELS (coma-separado).
+// ─────────────────────────────────────────────
+const DEFAULT_GEMINI_MODELS = [
+  'gemini-3-pro-image',
+  'gemini-2.5-flash-image',
+  'gemini-2.5-flash-image-preview',
+  'gemini-2.0-flash-preview-image-generation',
+];
+
+async function generateWithGeminiChain(positivePrompt, faceImg) {
+  const models = (process.env.GEMINI_IMAGE_MODELS
+    ? process.env.GEMINI_IMAGE_MODELS.split(',').map(s => s.trim()).filter(Boolean)
+    : DEFAULT_GEMINI_MODELS);
+
+  const errors = [];
+  for (const modelId of models) {
+    try {
+      console.log('[AI] Probando modelo Gemini:', modelId);
+      return await generateWithGeminiModel(positivePrompt, faceImg, modelId);
+    } catch (err) {
+      console.warn(`[AI] Modelo ${modelId} falló: ${err.message}`);
+      errors.push(`${modelId}: ${err.message}`);
+    }
+  }
+  throw new Error(`Gemini sin imagen tras probar ${models.length} modelo(s) → ${errors.join(' | ')}`);
+}
+
+// ─────────────────────────────────────────────
+// OpenAI — gpt-image-2 (respaldo)
 // ─────────────────────────────────────────────
 async function generateWithGPTImage2(positivePrompt) {
   const oai = openaiClient();
@@ -155,14 +217,15 @@ async function generateWithGPTImage2(positivePrompt) {
     size:    '1024x1536',
     quality: 'high',
   });
-  const img = res.data[0];
-  if (img.b64_json) return { type: 'base64', data: img.b64_json, mimeType: 'image/png' };
-  if (img.url)      return { type: 'url', url: img.url };
-  throw new Error('gpt-image-2: no image data returned.');
+  const img = res?.data?.[0];
+  if (img?.b64_json) return { type: 'base64', data: img.b64_json, mimeType: 'image/png' };
+  if (img?.url)      return { type: 'url', url: img.url };
+  throw new Error('gpt-image-2: sin datos de imagen');
 }
 
 // ─────────────────────────────────────────────
 // FUNCIÓN PRINCIPAL — generatePortrait
+// Con fallbacks: cadena de modelos Gemini + respaldo OpenAI.
 // @param {object} params
 // @param {string} params.positivePrompt
 // @param {string} params.negativePrompt
@@ -171,22 +234,40 @@ async function generateWithGPTImage2(positivePrompt) {
 async function generatePortrait({ positivePrompt, negativePrompt, faceImage }) {
   const provider = (process.env.AI_PROVIDER || 'gemini').toLowerCase();
 
-  console.log(`[AI] Provider: ${provider} | Modelo: ${provider === 'openai' ? 'gpt-image-2' : 'gemini-3-pro-image'}`);
+  // La foto de referencia es la fuente de verdad de la identidad (sin descripción textual).
+  let prompt = positivePrompt;
+  if (negativePrompt) prompt += `\n\nAVOID: ${negativePrompt}.`;
 
-  // Para máxima fidelidad facial NO inyectamos una descripción textual de la cara
-  // (tiende a "promediar" el rostro): la foto de referencia es la fuente de verdad.
-  let enrichedPrompt = positivePrompt;
+  const hasGemini = !!process.env.GEMINI_API_KEY;
+  const hasOpenAI = !!process.env.OPENAI_API_KEY;
 
-  // Gemini no tiene parámetro de negativos: se incluyen como línea AVOID en el texto.
-  if (negativePrompt) {
-    enrichedPrompt += `\n\nAVOID: ${negativePrompt}.`;
-  }
-
-  // Generar imagen
+  // Orden de proveedores según preferencia + claves disponibles.
+  const order = [];
   if (provider === 'openai') {
-    return generateWithGPTImage2(enrichedPrompt);
+    if (hasOpenAI) order.push('openai');
+    if (hasGemini) order.push('gemini');
+  } else {
+    if (hasGemini) order.push('gemini');
+    if (hasOpenAI) order.push('openai');
   }
-  return generateWithGemini3(enrichedPrompt, faceImage);
+
+  if (order.length === 0) {
+    throw new Error('No hay API keys configuradas (GEMINI_API_KEY u OPENAI_API_KEY).');
+  }
+
+  const errors = [];
+  for (const p of order) {
+    try {
+      console.log(`[AI] Generando con proveedor: ${p}`);
+      if (p === 'gemini') return await generateWithGeminiChain(prompt, faceImage);
+      if (p === 'openai') return await generateWithGPTImage2(prompt);
+    } catch (err) {
+      console.warn(`[AI] Proveedor ${p} falló: ${err.message}`);
+      errors.push(`${p} → ${err.message}`);
+    }
+  }
+
+  throw new Error(`No se pudo generar la imagen. Detalle: ${errors.join(' || ')}`);
 }
 
 module.exports = { generatePortrait, analyzeFace };
