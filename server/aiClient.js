@@ -219,42 +219,40 @@ async function generateWithOpenAI(positivePrompt, faceImg) {
   const oai = openaiClient();
   const { toFile } = require('openai');
 
-  // Intento 1: EDIT con imágenes de referencia (mejor fidelidad facial)
-  try {
-    const images = [];
-    if (faceImg) {
-      images.push(await toFile(Buffer.from(faceImg.base64, 'base64'), 'selfie.jpg', { type: faceImg.mimeType || 'image/jpeg' }));
-    }
-    if (JERSEY_IMG) images.push(await toFile(Buffer.from(JERSEY_IMG.base64, 'base64'), 'jersey.jpg', { type: 'image/jpeg' }));
-    if (BALL_IMG)   images.push(await toFile(Buffer.from(BALL_IMG.base64, 'base64'),   'ball.jpg',   { type: 'image/jpeg' }));
+  const MODEL = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-2';
 
-    if (images.length) {
+  // Intento 1: EDIT con la selfie (conserva identidad). Tamaño/calidad bajos
+  // para no exceder el límite de tiempo de Vercel.
+  try {
+    if (faceImg) {
+      const selfie = await toFile(Buffer.from(faceImg.base64, 'base64'), 'selfie.jpg', { type: faceImg.mimeType || 'image/jpeg' });
       const res = await oai.images.edit({
-        model:  'gpt-image-2',
-        image:  images,
-        prompt: positivePrompt,
-        size:   '1024x1536',
+        model:   MODEL,
+        image:   selfie,
+        prompt:  positivePrompt,
+        size:    '1024x1024',
+        quality: 'low',
       });
       const img = res?.data?.[0];
       if (img?.b64_json) return { type: 'base64', data: img.b64_json, mimeType: 'image/png' };
       if (img?.url)      return { type: 'url', url: img.url };
     }
   } catch (err) {
-    console.warn('[AI] gpt-image-2 edit falló, intento generate:', err.message);
+    console.warn(`[AI] ${MODEL} edit falló, intento generate:`, err.message);
   }
 
   // Intento 2: generación por texto
   const res = await oai.images.generate({
-    model:   'gpt-image-2',
+    model:   MODEL,
     prompt:  positivePrompt,
     n:       1,
-    size:    '1024x1536',
-    quality: 'high',
+    size:    '1024x1024',
+    quality: 'low',
   });
   const img = res?.data?.[0];
   if (img?.b64_json) return { type: 'base64', data: img.b64_json, mimeType: 'image/png' };
   if (img?.url)      return { type: 'url', url: img.url };
-  throw new Error('gpt-image-2: sin datos de imagen');
+  throw new Error(`${MODEL}: sin datos de imagen`);
 }
 
 // ─────────────────────────────────────────────
