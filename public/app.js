@@ -375,6 +375,12 @@ async function generateImage() {
       ? data.versions
       : [{ label: 'KALA', imageDataUrl: data.imageDataUrl, imageUrl: data.imageUrl }];
 
+    const anyOk = versions.some(v => v.imageDataUrl || v.imageUrl);
+    if (!anyOk) {
+      console.error('[APP] Falló la generación:', versions.map(v => v.detail).filter(Boolean));
+      throw new Error('No se generó ninguna versión.');
+    }
+
     finishLoadingAnimation(() => showResults(versions));
 
   } catch (err) {

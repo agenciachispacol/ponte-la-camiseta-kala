@@ -263,6 +263,15 @@ async function generateForProvider(provider, prompt, faceImage) {
   return generateWithGeminiChain(prompt, faceImage);
 }
 
+/** Limita una promesa a `ms` milisegundos. */
+function withTimeout(promise, ms, label) {
+  let t;
+  const timeout = new Promise((_, reject) => {
+    t = setTimeout(() => reject(new Error(`${label}: timeout tras ${Math.round(ms / 1000)}s`)), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(t));
+}
+
 // ─────────────────────────────────────────────
 // FUNCIÓN PRINCIPAL — generatePortrait
 // Con fallbacks: cadena de modelos Gemini + respaldo OpenAI.
@@ -310,4 +319,4 @@ async function generatePortrait({ positivePrompt, negativePrompt, faceImage }) {
   throw new Error(`No se pudo generar la imagen. Detalle: ${errors.join(' || ')}`);
 }
 
-module.exports = { generatePortrait, generateForProvider, analyzeFace };
+module.exports = { generatePortrait, generateForProvider, withTimeout, analyzeFace };

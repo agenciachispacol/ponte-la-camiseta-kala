@@ -6,8 +6,10 @@
 
 'use strict';
 
-const { construirPromptFinal }              = require('./promptBuilder');
-const { generatePortrait, generateForProvider } = require('./aiClient');
+const { construirPromptFinal }                            = require('./promptBuilder');
+const { generatePortrait, generateForProvider, withTimeout } = require('./aiClient');
+
+const PROVIDER_TIMEOUT_MS = 45000; // tope por motor para no superar el límite de Vercel
 
 /** Convierte un resultado de IA (o fallo) en una "versión" para el frontend. */
 function toVersion(label, provider, settled) {
@@ -16,8 +18,9 @@ function toVersion(label, provider, settled) {
     if (r.type === 'base64') return { label, provider, imageDataUrl: `data:${r.mimeType};base64,${r.data}` };
     if (r.type === 'url')    return { label, provider, imageUrl: r.url };
   }
-  console.warn(`[handler] versión ${label} falló:`, settled.reason?.message);
-  return { label, provider, error: true };
+  const detail = settled.reason?.message || 'error desconocido';
+  console.warn(`[handler] versión ${label} falló:`, detail);
+  return { label, provider, error: true, detail }; // detail = diagnóstico (no se muestra al usuario)
 }
 
 /**
@@ -82,8 +85,8 @@ async function handleGenerate(input) {
     if (negativePrompt) prompt += `\n\nAVOID: ${negativePrompt}.`;
 
     const [g, o] = await Promise.allSettled([
-      generateForProvider('gemini', prompt, faceImage),
-      generateForProvider('openai', prompt, faceImage),
+      withTimeout(generateForProvider('gemini', prompt, faceImage), PROVIDER_TIMEOUT_MS, 'gemini'),
+      withTimeout(generateForProvider('openai', prompt, faceImage), PROVIDER_TIMEOUT_MS, 'openai'),
     ]);
 
     const versions = [
@@ -92,7 +95,8 @@ async function handleGenerate(input) {
     ];
 
     if (!versions.some(v => v.imageDataUrl || v.imageUrl)) {
-      throw new Error('No se pudo generar ninguna versión.');
+      // Ninguna salió: devolvemos 200 con el detalle de cada fallo (para diagnóstico).
+      return { versions, metadata, allFailed: true };
     }
     return { versions, metadata };
   }
