@@ -50,7 +50,12 @@ function geminiClient() {
 
 function openaiClient() {
   if (!_OpenAI) _OpenAI = require('openai');
-  return new _OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  // maxRetries bajo + timeout para que falle rápido en vez de colgarse.
+  return new _OpenAI({
+    apiKey:     process.env.OPENAI_API_KEY,
+    maxRetries: 1,
+    timeout:    50000,
+  });
 }
 
 function inlinePart(img) {

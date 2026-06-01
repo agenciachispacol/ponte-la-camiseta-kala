@@ -9,7 +9,7 @@
 const { construirPromptFinal }                            = require('./promptBuilder');
 const { generatePortrait, generateForProvider, withTimeout } = require('./aiClient');
 
-const PROVIDER_TIMEOUT_MS = 45000; // tope por motor para no superar el límite de Vercel
+const PROVIDER_TIMEOUT_MS = 52000; // tope por motor para no superar el límite de Vercel (60s)
 
 /** Convierte un resultado de IA (o fallo) en una "versión" para el frontend. */
 function toVersion(label, provider, settled) {
