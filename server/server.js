@@ -38,6 +38,7 @@ app.post('/api/generate', async (req, res) => {
       selfieBase64: req.body.selfie,
       selfieMime:   req.body.selfieMime,
       mode:         req.body.mode,
+      provider:     req.body.provider,
     });
     res.json({ success: true, ...result });
   } catch (err) {

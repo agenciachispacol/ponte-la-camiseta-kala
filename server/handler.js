@@ -9,7 +9,7 @@
 const { construirPromptFinal }                            = require('./promptBuilder');
 const { generatePortrait, generateForProvider, withTimeout } = require('./aiClient');
 
-const PROVIDER_TIMEOUT_MS = 52000; // tope por motor para no superar el límite de Vercel (60s)
+const PROVIDER_TIMEOUT_MS = 58000; // tope por motor (cada pedido es su propia función de 60s)
 
 /** Convierte un resultado de IA (o fallo) en una "versión" para el frontend. */
 function toVersion(label, provider, settled) {
@@ -101,7 +101,21 @@ async function handleGenerate(input) {
     return { versions, metadata };
   }
 
-  // ── Modo single (con fallback automático) ───
+  // ── Un solo proveedor específico (cada pedido = su propia función de 60s) ──
+  if (input.provider === 'gemini' || input.provider === 'openai') {
+    let prompt = positivePrompt;
+    if (negativePrompt) prompt += `\n\nAVOID: ${negativePrompt}.`;
+    const result = await withTimeout(
+      generateForProvider(input.provider, prompt, faceImage),
+      PROVIDER_TIMEOUT_MS,
+      input.provider,
+    );
+    if (result.type === 'url')    return { imageUrl: result.url, provider: input.provider, metadata };
+    if (result.type === 'base64') return { imageDataUrl: `data:${result.mimeType};base64,${result.data}`, provider: input.provider, metadata };
+    throw new Error('Resultado de IA desconocido.');
+  }
+
+  // ── Modo single por defecto (con fallback automático) ───
   const result = await generatePortrait({ positivePrompt, negativePrompt, faceImage });
 
   if (result.type === 'url')    return { imageUrl: result.url, metadata };

@@ -221,22 +221,30 @@ async function generateWithOpenAI(positivePrompt, faceImg) {
 
   const MODEL = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-2';
   const SIZE  = process.env.OPENAI_IMAGE_SIZE  || '1024x1536';
-  const QUAL  = process.env.OPENAI_IMAGE_QUALITY || 'medium';
+  const QUAL  = process.env.OPENAI_IMAGE_QUALITY || 'high';
+
+  // Instrucción extra para que gpt-image REGENERE una foto integrada,
+  // en vez de pegar la selfie encima.
+  const oaiPrompt = positivePrompt +
+    '\n\nIMPORTANT FOR THIS RENDER: Produce a brand-new, fully photorealistic photograph — ' +
+    'do NOT paste or overlay the reference face as a cut-out. Re-render the entire scene so ' +
+    'the person is naturally integrated into the stadium: consistent lighting, shadows, skin ' +
+    'tones and perspective across face, body and background. Keep the exact same facial identity, ' +
+    'but everything must look like one cohesive real photo, not a collage.';
 
   // Intento 1: EDIT con la selfie + camiseta + balón como referencia, para
   // conservar identidad Y reproducir bien el logo/balón (no inventarlos).
   try {
-    // Solo selfie + camiseta: conserva la cara y el logo correcto, y deja
-    // margen de tiempo (el balón se describe en el prompt).
     const images = [];
     if (faceImg)    images.push(await toFile(Buffer.from(faceImg.base64, 'base64'),  'selfie.jpg', { type: faceImg.mimeType || 'image/jpeg' }));
     if (JERSEY_IMG) images.push(await toFile(Buffer.from(JERSEY_IMG.base64, 'base64'), 'jersey.jpg', { type: 'image/jpeg' }));
+    if (BALL_IMG)   images.push(await toFile(Buffer.from(BALL_IMG.base64, 'base64'),   'ball.jpg',   { type: 'image/jpeg' }));
 
     if (images.length) {
       const res = await oai.images.edit({
         model:   MODEL,
         image:   images,
-        prompt:  positivePrompt,
+        prompt:  oaiPrompt,
         size:    SIZE,
         quality: QUAL,
       });
@@ -251,7 +259,7 @@ async function generateWithOpenAI(positivePrompt, faceImg) {
   // Intento 2: generación por texto
   const res = await oai.images.generate({
     model:   MODEL,
-    prompt:  positivePrompt,
+    prompt:  oaiPrompt,
     n:       1,
     size:    SIZE,
     quality: QUAL,

@@ -351,33 +351,35 @@ async function generateImage() {
   startLoadingAnimation();
 
   try {
-    const response = await fetch('/api/generate', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({
-        selfie:     state.selfieBase64,
-        selfieMime: state.selfieMime,
-        genero:     state.genero,
-        altura:     state.altura,
-        peso:       state.peso,
-        mode:       'both',   // genera 2 versiones: Gemini + OpenAI
-      }),
-    });
+    const base = {
+      selfie:     state.selfieBase64,
+      selfieMime: state.selfieMime,
+      genero:     state.genero,
+      altura:     state.altura,
+      peso:       state.peso,
+    };
 
-    const data = await response.json();
+    // 2 pedidos independientes (cada motor tiene su propio tiempo de ejecución).
+    const reqOne = (provider, label) =>
+      fetch('/api/generate', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ ...base, provider }),
+      })
+      .then(r => r.json())
+      .then(d => {
+        if (!d || !d.success) throw new Error(d && d.error ? d.error : 'fallo');
+        return { label, imageDataUrl: d.imageDataUrl, imageUrl: d.imageUrl };
+      })
+      .catch(err => { console.warn(`[APP] ${label} falló:`, err.message); return { label, error: true }; });
 
-    if (!response.ok || !data.success) {
-      throw new Error(data.error || 'Error al generar la imagen.');
-    }
+    const settled = await Promise.all([
+      reqOne('gemini', 'Opción 1'),
+      reqOne('openai', 'Opción 2'),
+    ]);
 
-    // Respuesta con 2 versiones, o una sola (compatibilidad)
-    const versions = Array.isArray(data.versions)
-      ? data.versions
-      : [{ label: 'KALA', imageDataUrl: data.imageDataUrl, imageUrl: data.imageUrl }];
-
-    const anyOk = versions.some(v => v.imageDataUrl || v.imageUrl);
-    if (!anyOk) {
-      console.error('[APP] Falló la generación:', versions.map(v => v.detail).filter(Boolean));
+    const versions = settled.filter(v => v.imageDataUrl || v.imageUrl);
+    if (versions.length === 0) {
       throw new Error('No se generó ninguna versión.');
     }
 
