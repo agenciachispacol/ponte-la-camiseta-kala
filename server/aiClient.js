@@ -243,14 +243,10 @@ async function generateWithOpenAI(positivePrompt, faceImg) {
 
     if (images.length) {
       const editParams = { model: MODEL, image: images, prompt: oaiPrompt, size: SIZE, quality: QUAL };
-      let res;
-      try {
-        // input_fidelity high: conserva cara y logo de las referencias
-        res = await oai.images.edit({ ...editParams, input_fidelity: 'high' });
-      } catch (e1) {
-        console.warn('[AI] edit con input_fidelity falló, reintento sin él:', e1.message);
-        res = await oai.images.edit(editParams);
-      }
+      // input_fidelity 'high' mejora la fidelidad pero es muy lento (se pasa de
+      // los 60s de Vercel). Solo se activa si se pide por env.
+      if (process.env.OPENAI_INPUT_FIDELITY === 'high') editParams.input_fidelity = 'high';
+      const res = await oai.images.edit(editParams);
       const img = res?.data?.[0];
       if (img?.b64_json) return { type: 'base64', data: img.b64_json, mimeType: 'image/png', model: MODEL };
       if (img?.url)      return { type: 'url', url: img.url, model: MODEL };
