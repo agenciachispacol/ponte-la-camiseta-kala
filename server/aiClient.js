@@ -221,7 +221,7 @@ async function generateWithOpenAI(positivePrompt, faceImg) {
   const { toFile } = require('openai');
 
   const MODEL = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-2';
-  const SIZE  = process.env.OPENAI_IMAGE_SIZE  || '1024x1536';
+  const SIZE  = process.env.OPENAI_IMAGE_SIZE  || '1024x1024'; // más rápido y bien para foto de perfil
   const QUAL  = process.env.OPENAI_IMAGE_QUALITY || 'medium'; // 'high' requiere Vercel Pro (más de 60s)
 
   // Instrucción extra para que gpt-image REGENERE una foto integrada,
