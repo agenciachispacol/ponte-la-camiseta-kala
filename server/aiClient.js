@@ -206,10 +206,39 @@ async function generateWithGeminiChain(positivePrompt, faceImg) {
 }
 
 // ─────────────────────────────────────────────
-// OpenAI — gpt-image-2 (respaldo)
+// OpenAI — gpt-image-2
+// Usa EDIT con la selfie + camiseta + balón para conservar la identidad.
+// Si el edit falla, cae a generación por texto.
 // ─────────────────────────────────────────────
-async function generateWithGPTImage2(positivePrompt) {
+async function generateWithOpenAI(positivePrompt, faceImg) {
   const oai = openaiClient();
+  const { toFile } = require('openai');
+
+  // Intento 1: EDIT con imágenes de referencia (mejor fidelidad facial)
+  try {
+    const images = [];
+    if (faceImg) {
+      images.push(await toFile(Buffer.from(faceImg.base64, 'base64'), 'selfie.jpg', { type: faceImg.mimeType || 'image/jpeg' }));
+    }
+    if (JERSEY_IMG) images.push(await toFile(Buffer.from(JERSEY_IMG.base64, 'base64'), 'jersey.jpg', { type: 'image/jpeg' }));
+    if (BALL_IMG)   images.push(await toFile(Buffer.from(BALL_IMG.base64, 'base64'),   'ball.jpg',   { type: 'image/jpeg' }));
+
+    if (images.length) {
+      const res = await oai.images.edit({
+        model:  'gpt-image-2',
+        image:  images,
+        prompt: positivePrompt,
+        size:   '1024x1536',
+      });
+      const img = res?.data?.[0];
+      if (img?.b64_json) return { type: 'base64', data: img.b64_json, mimeType: 'image/png' };
+      if (img?.url)      return { type: 'url', url: img.url };
+    }
+  } catch (err) {
+    console.warn('[AI] gpt-image-2 edit falló, intento generate:', err.message);
+  }
+
+  // Intento 2: generación por texto
   const res = await oai.images.generate({
     model:   'gpt-image-2',
     prompt:  positivePrompt,
@@ -221,6 +250,17 @@ async function generateWithGPTImage2(positivePrompt) {
   if (img?.b64_json) return { type: 'base64', data: img.b64_json, mimeType: 'image/png' };
   if (img?.url)      return { type: 'url', url: img.url };
   throw new Error('gpt-image-2: sin datos de imagen');
+}
+
+// ─────────────────────────────────────────────
+// Genera con UN proveedor concreto (para comparación A/B).
+// @param {'gemini'|'openai'} provider
+// @param {string} prompt  prompt completo (ya incluye AVOID)
+// @param {object} faceImage { base64, mimeType }
+// ─────────────────────────────────────────────
+async function generateForProvider(provider, prompt, faceImage) {
+  if (provider === 'openai') return generateWithOpenAI(prompt, faceImage);
+  return generateWithGeminiChain(prompt, faceImage);
 }
 
 // ─────────────────────────────────────────────
@@ -260,7 +300,7 @@ async function generatePortrait({ positivePrompt, negativePrompt, faceImage }) {
     try {
       console.log(`[AI] Generando con proveedor: ${p}`);
       if (p === 'gemini') return await generateWithGeminiChain(prompt, faceImage);
-      if (p === 'openai') return await generateWithGPTImage2(prompt);
+      if (p === 'openai') return await generateWithOpenAI(prompt, faceImage);
     } catch (err) {
       console.warn(`[AI] Proveedor ${p} falló: ${err.message}`);
       errors.push(`${p} → ${err.message}`);
@@ -270,4 +310,4 @@ async function generatePortrait({ positivePrompt, negativePrompt, faceImage }) {
   throw new Error(`No se pudo generar la imagen. Detalle: ${errors.join(' || ')}`);
 }
 
-module.exports = { generatePortrait, analyzeFace };
+module.exports = { generatePortrait, generateForProvider, analyzeFace };

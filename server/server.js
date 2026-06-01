@@ -37,6 +37,7 @@ app.post('/api/generate', async (req, res) => {
       peso:         req.body.peso,
       selfieBase64: req.body.selfie,
       selfieMime:   req.body.selfieMime,
+      mode:         req.body.mode,
     });
     res.json({ success: true, ...result });
   } catch (err) {

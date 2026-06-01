@@ -6,8 +6,19 @@
 
 'use strict';
 
-const { construirPromptFinal } = require('./promptBuilder');
-const { generatePortrait }     = require('./aiClient');
+const { construirPromptFinal }              = require('./promptBuilder');
+const { generatePortrait, generateForProvider } = require('./aiClient');
+
+/** Convierte un resultado de IA (o fallo) en una "versión" para el frontend. */
+function toVersion(label, provider, settled) {
+  if (settled.status === 'fulfilled') {
+    const r = settled.value;
+    if (r.type === 'base64') return { label, provider, imageDataUrl: `data:${r.mimeType};base64,${r.data}` };
+    if (r.type === 'url')    return { label, provider, imageUrl: r.url };
+  }
+  console.warn(`[handler] versión ${label} falló:`, settled.reason?.message);
+  return { label, provider, error: true };
+}
 
 /**
  * Procesa una solicitud de generación.
@@ -38,32 +49,59 @@ async function handleGenerate(input) {
     const e = new Error('Peso inválido (30-300 kg).'); e.status = 400; throw e;
   }
 
+  const both      = input.mode === 'both';
+  const faceImage = { base64: input.selfieBase64, mimeType: input.selfieMime || 'image/jpeg' };
+
   // ── Modo demo ───────────────────────────────
   if (process.env.DEMO_MODE === 'true') {
     await new Promise(r => setTimeout(r, 2500));
+    const demoUrl = 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=768&q=80';
+    if (both) {
+      return {
+        demo: true,
+        versions: [
+          { label: 'Gemini', provider: 'gemini', imageUrl: demoUrl },
+          { label: 'OpenAI', provider: 'openai', imageUrl: demoUrl },
+        ],
+        metadata: { genero, altura, peso },
+      };
+    }
     return {
-      demo:     true,
-      imageUrl: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=768&q=80',
+      demo: true, imageUrl: demoUrl,
       metadata: { genero, altura, peso },
-      message:  'Demo mode. Configura GEMINI_API_KEY y DEMO_MODE=false para generación real.',
+      message: 'Demo mode. Configura GEMINI_API_KEY y DEMO_MODE=false para generación real.',
     };
   }
 
-  // ── Construir prompt + generar ──────────────
+  // ── Construir prompt ────────────────────────
   const { positivePrompt, negativePrompt, metadata } = construirPromptFinal({ genero, altura, peso });
 
-  const result = await generatePortrait({
-    positivePrompt,
-    negativePrompt,
-    faceImage: { base64: input.selfieBase64, mimeType: input.selfieMime || 'image/jpeg' },
-  });
+  // ── Modo "2 versiones" (Gemini + OpenAI en paralelo) ──
+  if (both) {
+    let prompt = positivePrompt;
+    if (negativePrompt) prompt += `\n\nAVOID: ${negativePrompt}.`;
 
-  if (result.type === 'url') {
-    return { imageUrl: result.url, metadata };
+    const [g, o] = await Promise.allSettled([
+      generateForProvider('gemini', prompt, faceImage),
+      generateForProvider('openai', prompt, faceImage),
+    ]);
+
+    const versions = [
+      toVersion('Gemini', 'gemini', g),
+      toVersion('OpenAI', 'openai', o),
+    ];
+
+    if (!versions.some(v => v.imageDataUrl || v.imageUrl)) {
+      throw new Error('No se pudo generar ninguna versión.');
+    }
+    return { versions, metadata };
   }
-  if (result.type === 'base64') {
-    return { imageDataUrl: `data:${result.mimeType};base64,${result.data}`, metadata };
-  }
+
+  // ── Modo single (con fallback automático) ───
+  const result = await generatePortrait({ positivePrompt, negativePrompt, faceImage });
+
+  if (result.type === 'url')    return { imageUrl: result.url, metadata };
+  if (result.type === 'base64') return { imageDataUrl: `data:${result.mimeType};base64,${result.data}`, metadata };
   throw new Error('Resultado de IA desconocido.');
 }
 

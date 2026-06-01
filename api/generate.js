@@ -24,6 +24,7 @@ module.exports = async (req, res) => {
       peso:         body.peso,
       selfieBase64: body.selfie,
       selfieMime:   body.selfieMime,
+      mode:         body.mode,
     });
 
     res.status(200).json({ success: true, ...result });
