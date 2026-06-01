@@ -242,13 +242,15 @@ async function generateWithOpenAI(positivePrompt, faceImg) {
     if (BALL_IMG)   images.push(await toFile(Buffer.from(BALL_IMG.base64, 'base64'),   'ball.jpg',   { type: 'image/jpeg' }));
 
     if (images.length) {
-      const res = await oai.images.edit({
-        model:   MODEL,
-        image:   images,
-        prompt:  oaiPrompt,
-        size:    SIZE,
-        quality: QUAL,
-      });
+      const editParams = { model: MODEL, image: images, prompt: oaiPrompt, size: SIZE, quality: QUAL };
+      let res;
+      try {
+        // input_fidelity high: conserva cara y logo de las referencias
+        res = await oai.images.edit({ ...editParams, input_fidelity: 'high' });
+      } catch (e1) {
+        console.warn('[AI] edit con input_fidelity falló, reintento sin él:', e1.message);
+        res = await oai.images.edit(editParams);
+      }
       const img = res?.data?.[0];
       if (img?.b64_json) return { type: 'base64', data: img.b64_json, mimeType: 'image/png', model: MODEL };
       if (img?.url)      return { type: 'url', url: img.url, model: MODEL };

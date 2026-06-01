@@ -47,6 +47,15 @@ LIGHTING & QUALITY: Cinematic stadium lighting, soft key light on the face so it
 recognizable, gentle rim light. Ultra-realistic photograph, natural skin texture with visible
 pores, no plastic/over-smoothed skin, correct hand anatomy, photojournalistic quality.
 
+COHESION (avoid a pasted / cut-out look): Render everything as ONE single real photograph.
+RE-LIGHT the face and skin to match the stadium floodlights — cool blue rim light from behind,
+warm key light from above — so the face is NOT brighter, flatter or a different color than the
+body and background. Match white balance, color temperature and contrast across face, jersey
+and scene. Cast realistic contact shadows from the body onto the surroundings and matching
+shadows on the face. Apply the SAME subtle film grain and color grade over the entire frame.
+No hard edges or halo around the head or hair, no sticker/cut-out effect, no seams where the
+face meets the neck — the person must look genuinely photographed in that stadium.
+
 FINAL AND MOST IMPORTANT INSTRUCTION: The generated face MUST be the SAME person as the FACE
 REFERENCE image — copy their real face faithfully (same proportions, features and expression
 character), fully recognizable as that individual. Facial likeness to the reference photo
@@ -62,6 +71,8 @@ const NEGATIVE_BASE = [
   'generic face', 'unrecognizable', 'altered facial features',
   'CGI', 'illustration', 'cartoon', 'animation', 'painting', 'drawing', 'render',
   'AI look', 'plastic skin', 'smooth skin', 'uncanny valley', 'beauty filter',
+  'pasted face', 'cut-out', 'sticker effect', 'photo collage', 'floating head',
+  'halo around head', 'mismatched lighting', 'green screen', 'visible seams',
   'distorted face', 'deformed face', 'extra limbs', 'missing fingers',
   'bad anatomy', 'wrong anatomy', 'blurry face', 'low resolution',
   'watermark', 'text overlay', 'signature', 'logo overlay',
