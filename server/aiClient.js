@@ -178,6 +178,7 @@ async function generateWithGeminiModel(positivePrompt, faceImg, modelId) {
 
   const img = extractImageFromResponse(result.response);
   if (!img) throw new Error(`${modelId}: respuesta sin imagen`);
+  img.model = modelId;
   return img;
 }
 
@@ -249,8 +250,8 @@ async function generateWithOpenAI(positivePrompt, faceImg) {
         quality: QUAL,
       });
       const img = res?.data?.[0];
-      if (img?.b64_json) return { type: 'base64', data: img.b64_json, mimeType: 'image/png' };
-      if (img?.url)      return { type: 'url', url: img.url };
+      if (img?.b64_json) return { type: 'base64', data: img.b64_json, mimeType: 'image/png', model: MODEL };
+      if (img?.url)      return { type: 'url', url: img.url, model: MODEL };
     }
   } catch (err) {
     console.warn(`[AI] ${MODEL} edit falló, intento generate:`, err.message);
@@ -265,8 +266,8 @@ async function generateWithOpenAI(positivePrompt, faceImg) {
     quality: QUAL,
   });
   const img = res?.data?.[0];
-  if (img?.b64_json) return { type: 'base64', data: img.b64_json, mimeType: 'image/png' };
-  if (img?.url)      return { type: 'url', url: img.url };
+  if (img?.b64_json) return { type: 'base64', data: img.b64_json, mimeType: 'image/png', model: MODEL };
+  if (img?.url)      return { type: 'url', url: img.url, model: MODEL };
   throw new Error(`${MODEL}: sin datos de imagen`);
 }
 

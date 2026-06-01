@@ -110,8 +110,8 @@ async function handleGenerate(input) {
       PROVIDER_TIMEOUT_MS,
       input.provider,
     );
-    if (result.type === 'url')    return { imageUrl: result.url, provider: input.provider, metadata };
-    if (result.type === 'base64') return { imageDataUrl: `data:${result.mimeType};base64,${result.data}`, provider: input.provider, metadata };
+    if (result.type === 'url')    return { imageUrl: result.url, provider: input.provider, model: result.model, metadata };
+    if (result.type === 'base64') return { imageDataUrl: `data:${result.mimeType};base64,${result.data}`, provider: input.provider, model: result.model, metadata };
     throw new Error('Resultado de IA desconocido.');
   }
 
