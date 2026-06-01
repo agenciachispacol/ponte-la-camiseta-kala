@@ -192,7 +192,7 @@ function processFile(file) {
     state.selfieMime   = mime;
     document.getElementById('btn-step1').disabled = false;
   }).catch(() => {
-    showUploadError('No se pudo procesar la imagen. Probá con otra.');
+    showUploadError('No se pudo procesar la imagen. Prueba con otra.');
   });
 }
 
