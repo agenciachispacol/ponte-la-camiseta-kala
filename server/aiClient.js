@@ -220,18 +220,24 @@ async function generateWithOpenAI(positivePrompt, faceImg) {
   const { toFile } = require('openai');
 
   const MODEL = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-2';
+  const SIZE  = process.env.OPENAI_IMAGE_SIZE  || '1024x1536';
+  const QUAL  = process.env.OPENAI_IMAGE_QUALITY || 'medium';
 
-  // Intento 1: EDIT con la selfie (conserva identidad). Tamaño/calidad bajos
-  // para no exceder el límite de tiempo de Vercel.
+  // Intento 1: EDIT con la selfie + camiseta + balón como referencia, para
+  // conservar identidad Y reproducir bien el logo/balón (no inventarlos).
   try {
-    if (faceImg) {
-      const selfie = await toFile(Buffer.from(faceImg.base64, 'base64'), 'selfie.jpg', { type: faceImg.mimeType || 'image/jpeg' });
+    const images = [];
+    if (faceImg)    images.push(await toFile(Buffer.from(faceImg.base64, 'base64'),  'selfie.jpg', { type: faceImg.mimeType || 'image/jpeg' }));
+    if (JERSEY_IMG) images.push(await toFile(Buffer.from(JERSEY_IMG.base64, 'base64'), 'jersey.jpg', { type: 'image/jpeg' }));
+    if (BALL_IMG)   images.push(await toFile(Buffer.from(BALL_IMG.base64, 'base64'),   'ball.jpg',   { type: 'image/jpeg' }));
+
+    if (images.length) {
       const res = await oai.images.edit({
         model:   MODEL,
-        image:   selfie,
+        image:   images,
         prompt:  positivePrompt,
-        size:    '1024x1024',
-        quality: 'low',
+        size:    SIZE,
+        quality: QUAL,
       });
       const img = res?.data?.[0];
       if (img?.b64_json) return { type: 'base64', data: img.b64_json, mimeType: 'image/png' };
@@ -246,8 +252,8 @@ async function generateWithOpenAI(positivePrompt, faceImg) {
     model:   MODEL,
     prompt:  positivePrompt,
     n:       1,
-    size:    '1024x1024',
-    quality: 'low',
+    size:    SIZE,
+    quality: QUAL,
   });
   const img = res?.data?.[0];
   if (img?.b64_json) return { type: 'base64', data: img.b64_json, mimeType: 'image/png' };
