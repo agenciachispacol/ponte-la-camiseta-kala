@@ -226,10 +226,11 @@ async function generateWithOpenAI(positivePrompt, faceImg) {
   // Intento 1: EDIT con la selfie + camiseta + balón como referencia, para
   // conservar identidad Y reproducir bien el logo/balón (no inventarlos).
   try {
+    // Solo selfie + camiseta: conserva la cara y el logo correcto, y deja
+    // margen de tiempo (el balón se describe en el prompt).
     const images = [];
     if (faceImg)    images.push(await toFile(Buffer.from(faceImg.base64, 'base64'),  'selfie.jpg', { type: faceImg.mimeType || 'image/jpeg' }));
     if (JERSEY_IMG) images.push(await toFile(Buffer.from(JERSEY_IMG.base64, 'base64'), 'jersey.jpg', { type: 'image/jpeg' }));
-    if (BALL_IMG)   images.push(await toFile(Buffer.from(BALL_IMG.base64, 'base64'),   'ball.jpg',   { type: 'image/jpeg' }));
 
     if (images.length) {
       const res = await oai.images.edit({
