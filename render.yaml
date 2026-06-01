@@ -1,0 +1,36 @@
+# Blueprint de Render — despliega el backend (Express) sin límite de 60s.
+# El servidor también sirve el frontend de /public, así que toda la app
+# queda en una sola URL de Render.
+#
+# Cómo usar:
+#   1. Render → New → Blueprint → conecta el repo de GitHub.
+#   2. Render lee este archivo y pide GEMINI_API_KEY y OPENAI_API_KEY.
+#   3. Deploy. Listo.
+services:
+  - type: web
+    name: ponte-la-camiseta-kala
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: DEMO_MODE
+        value: "false"
+      - key: AI_PROVIDER
+        value: gemini
+      # Sin límite de 60s → alta calidad en OpenAI
+      - key: GEN_TIMEOUT_MS
+        value: "180000"
+      - key: OPENAI_IMAGE_QUALITY
+        value: high
+      - key: OPENAI_IMAGE_SIZE
+        value: 1024x1536
+      - key: OPENAI_INPUT_FIDELITY
+        value: high
+      # Secretos: Render los pide al desplegar (no se guardan en el repo)
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
