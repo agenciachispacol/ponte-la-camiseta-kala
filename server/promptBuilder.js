@@ -17,13 +17,21 @@ REFERENCE photo and place them in a football stadium wearing the KALA jersey.
 #1 RULE — IDENTITY LOCK (most important): The output face must be a NEAR-EXACT COPY of the
 person in the FACE REFERENCE photo — treat it almost like keeping the original face pixels.
 Replicate precisely: the exact face shape and bone structure, the exact eye shape, color and
-spacing, the exact nose shape, the exact mouth and lips, the jawline and chin, the eyebrows,
-the skin tone and skin texture, any facial hair, moles, freckles or distinctive marks, the
-hairline and hairstyle, and the apparent age and weight of the face. If the person wears
-glasses in the reference, keep the glasses. It must be SO similar that a friend instantly
-recognizes them. DO NOT beautify, slim, smooth, rejuvenate, symmetrize or idealize the face,
-and DO NOT blend it with a generic or model face. Facial likeness is the #1 priority — above
-pose, lighting, jersey and background.
+spacing (keep light/green/hazel eyes if they are light — do NOT make the eyes darker), the
+exact nose shape, the exact mouth and lips, the jawline and chin, the eyebrows, the skin tone
+and skin texture, any facial hair, moles, freckles or distinctive marks, the hairline and
+hairstyle, and the apparent age.
+
+CRITICAL — KEEP THE FACE WEIGHT AND FULLNESS: Reproduce the person's real facial fat and
+roundness EXACTLY. If the face is round, full, chubby or has fuller cheeks, a softer jawline,
+a double chin or a wider face, KEEP IT EXACTLY THAT WAY. NEVER slim the face, NEVER sharpen or
+chisel the jaw or cheekbones, NEVER make them look more athletic, fit, older or more handsome.
+A heavier, rounder real face must stay heavy and round. Keep them looking their real age and
+real weight.
+
+It must be SO similar that a friend instantly recognizes them. DO NOT beautify, slim, smooth,
+rejuvenate, symmetrize, age or idealize the face, and DO NOT blend it with a generic athlete
+or model face. Facial likeness is the #1 priority — above pose, lighting, jersey and background.
 
 FRAMING: Close head-and-shoulders PORTRAIT (bust shot). The face is large and dominant,
 filling the upper part of the frame, perfectly sharp and in focus — this is essential for the
@@ -74,6 +82,9 @@ const NEGATIVE_BASE = [
   'different person', 'different face', 'changed identity', 'face swap',
   'beautified face', 'idealized face', 'younger face', 'older face', 'model face',
   'generic face', 'unrecognizable', 'altered facial features',
+  'slimmer face', 'slimmed face', 'thinner face', 'chiseled jaw', 'sharp jawline',
+  'defined cheekbones', 'athletic face', 'handsome model', 'changed face shape',
+  'darker eyes', 'changed eye color',
   'CGI', 'illustration', 'cartoon', 'animation', 'painting', 'drawing', 'render',
   'AI look', 'plastic skin', 'smooth skin', 'uncanny valley', 'beauty filter',
   'pasted face', 'cut-out', 'sticker effect', 'photo collage', 'floating head',
