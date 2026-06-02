@@ -237,18 +237,17 @@ async function generateWithOpenAI(positivePrompt, faceImg) {
   // Intento 1: EDIT con la selfie + camiseta + balón como referencia, para
   // conservar identidad Y reproducir bien el logo/balón (no inventarlos).
   try {
-    // Selfie (persona) + camiseta + balón (productos). El prompt aclara el rol
-    // de cada imagen para que NO tome la cara de los productos.
+    // SOLO la selfie → editar tu foto preserva tu cara (como en ChatGPT).
+    // Mandar camiseta/balón como imágenes hacía que re-inventara la persona.
+    // La camiseta, el logo y el balón van descritos en el texto del prompt.
     const images = [];
-    if (faceImg)    images.push(await toFile(Buffer.from(faceImg.base64, 'base64'),  'selfie.jpg', { type: faceImg.mimeType || 'image/jpeg' }));
-    if (JERSEY_IMG) images.push(await toFile(Buffer.from(JERSEY_IMG.base64, 'base64'), 'jersey.jpg', { type: 'image/jpeg' }));
-    if (BALL_IMG)   images.push(await toFile(Buffer.from(BALL_IMG.base64, 'base64'),   'ball.jpg',   { type: 'image/jpeg' }));
+    if (faceImg) images.push(await toFile(Buffer.from(faceImg.base64, 'base64'), 'selfie.jpg', { type: faceImg.mimeType || 'image/jpeg' }));
 
     if (images.length) {
       const editParams = { model: MODEL, image: images, prompt: oaiPrompt, size: SIZE, quality: QUAL };
-      // input_fidelity 'high' conserva cara y logo (mejor parecido). Activo por
-      // defecto; se desactiva con OPENAI_INPUT_FIDELITY=off si se necesita más rápido.
-      if (process.env.OPENAI_INPUT_FIDELITY !== 'off') editParams.input_fidelity = 'high';
+      // input_fidelity 'high' pega mucho la cara (efecto "puesta"). Por defecto NO
+      // se usa para que integre más natural; se puede forzar con OPENAI_INPUT_FIDELITY=high.
+      if (process.env.OPENAI_INPUT_FIDELITY === 'high') editParams.input_fidelity = 'high';
       const res = await oai.images.edit(editParams);
       const img = res?.data?.[0];
       if (img?.b64_json) return { type: 'base64', data: img.b64_json, mimeType: 'image/png', model: MODEL };
