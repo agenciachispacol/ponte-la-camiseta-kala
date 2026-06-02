@@ -11,7 +11,7 @@ const { generatePortrait, generateForProvider, withTimeout } = require('./aiClie
 
 // Tope por motor. En Vercel free conviene <60s; en Render (sin límite) se sube
 // con GEN_TIMEOUT_MS para permitir alta calidad.
-const PROVIDER_TIMEOUT_MS = parseInt(process.env.GEN_TIMEOUT_MS, 10) || 58000;
+const PROVIDER_TIMEOUT_MS = parseInt(process.env.GEN_TIMEOUT_MS, 10) || 120000;
 
 // Variaciones de pose/encuadre para tener 2 opciones distintas con el mismo motor.
 const VARIANTS = {

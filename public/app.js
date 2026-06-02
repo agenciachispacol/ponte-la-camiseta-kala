@@ -12,7 +12,7 @@
    Para frontend en Vercel + API en Render, poner aquí
    la URL de Render, ej: 'https://ponte-la-camiseta-kala.onrender.com'
    ═══════════════════════════════════════════════ */
-const API_BASE = 'https://ponte-la-camiseta-kala.onrender.com';
+const API_BASE = '';
 
 /* ═══════════════════════════════════════════════
    ESTADO GLOBAL

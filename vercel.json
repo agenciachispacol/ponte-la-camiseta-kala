@@ -3,7 +3,7 @@
   "functions": {
     "api/generate.js": {
       "includeFiles": "refs/**",
-      "maxDuration": 60
+      "maxDuration": 300
     }
   },
   "headers": [
