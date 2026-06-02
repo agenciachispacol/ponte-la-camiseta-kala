@@ -40,14 +40,17 @@ SETTING: Packed nighttime football stadium, Colombia, dramatic stadium floodligh
 electric green pitch in the background, crowd blurred in cool blue bokeh, subtle haze,
 cinematic atmosphere, sky deep blue-black with stadium glow.
 
-JERSEY: Dress the person in the official KALA jersey from the JERSEY REFERENCE image —
-a clean WHITE performance jersey with a navy-blue "kala" wordmark across the chest and a
-small navy "k" logo on the upper right chest, V-neck with subtle navy trim. Reproduce the
-jersey design, colors and logo placement EXACTLY. Real fabric texture, natural fit, not CGI.
+JERSEY (must be exactly this — if a JERSEY REFERENCE image is provided, copy it; otherwise
+build it from this description): Replace whatever the person is wearing with a PLAIN WHITE
+short-sleeve soccer jersey. ACROSS THE CENTER OF THE CHEST, in large, bold, LOWERCASE
+navy-blue letters, write the brand name spelled exactly "kala" (k-a-l-a) — clearly legible,
+correctly spelled, no other words. A small navy-blue lowercase "k" logo sits on the upper-RIGHT
+chest. V-neck collar with a thin navy-blue trim, and a thin navy trim on the sleeve cuffs.
+The rest of the jersey is clean white with subtle tonal texture. Realistic fabric, natural fit.
 
-BALL: The person holds the official match ball from the BALL REFERENCE image — an adidas
-TRIONDA ball, white base with vivid multicolor panels (red, green, blue). Held up near the
-chest or shoulder so it stays in frame. Reproduce its pattern and colors EXACTLY.
+BALL: The person holds ONE soccer ball in frame (at chest height or under the arm) — a modern
+match ball with a WHITE base covered in vivid multicolor geometric panels in RED, BLUE and
+GREEN (adidas World Cup "Trionda" style). Make it clearly a colorful real football, not plain.
 
 {SECCION_BODY}
 
