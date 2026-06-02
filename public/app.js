@@ -501,12 +501,12 @@ function showResults(versions) {
     if (!url) {
       const fail = document.createElement('div');
       fail.className = 'version-card version-failed';
-      const dbgF = DEBUG ? `<p class="model-tag">🔧 ${v.provider || ''}</p>` : '';
+      const dbgF = DEBUG ? `<p class="model-tag">🔧 ${v.provider || ''}</p>
+        <p class="fail-detail">${String(v.detail || '').replace(/[<>]/g, '')}</p>` : '';
       fail.innerHTML = `
         <div class="version-label">${label}</div>
         ${dbgF}
-        <p class="fail-note">⚠️ No se pudo generar esta versión en este intento.</p>
-        <p class="fail-detail">${String(v.detail || '').replace(/[<>]/g, '')}</p>`;
+        <p class="fail-note">⚠️ Esta versión no salió esta vez. Intenta "Generar otro retrato".</p>`;
       cont.appendChild(fail);
       return;
     }
