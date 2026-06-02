@@ -29,6 +29,11 @@ chisel the jaw or cheekbones, NEVER make them look more athletic, fit, older or 
 A heavier, rounder real face must stay heavy and round. Keep them looking their real age and
 real weight.
 
+CRITICAL — KEEP THE EXACT HAIR: Match the hairstyle and hair length precisely. If the hair is
+very short, buzzed, shaved at the sides or faded, KEEP IT exactly that short — do NOT add
+length, curls, waves or volume. Match the exact hairline. Keep the same facial-hair style
+(beard/goatee/stubble) exactly as in the reference.
+
 It must be SO similar that a friend instantly recognizes them. DO NOT beautify, slim, smooth,
 rejuvenate, symmetrize, age or idealize the face, and DO NOT blend it with a generic athlete
 or model face. Facial likeness is the #1 priority — above pose, lighting, jersey and background.

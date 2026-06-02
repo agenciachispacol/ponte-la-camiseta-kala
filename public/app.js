@@ -382,10 +382,11 @@ async function generateImage() {
       })
       .catch(err => { console.warn(`[APP] ${label} falló:`, err.message); return { label, error: true, detail: err.message }; });
 
-    // Opción 1 = Gemini, Opción 2 = OpenAI (APIs distintas → en paralelo).
+    // Las 2 versiones con Gemini (el que respeta cara + logo), en 2 poses
+    // distintas. OpenAI re-inventa la cara, así que no se usa.
     const settled = await Promise.all([
-      reqOne('gemini', undefined, 'Opción 1'),
-      reqOne('openai', undefined, 'Opción 2'),
+      reqOne('gemini', 'a', 'Opción 1'),
+      reqOne('gemini', 'b', 'Opción 2'),
     ]);
 
     if (!settled.some(v => v.imageDataUrl || v.imageUrl)) {
