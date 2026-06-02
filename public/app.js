@@ -7,6 +7,14 @@
 'use strict';
 
 /* ═══════════════════════════════════════════════
+   API BASE
+   '' = mismo origen (Render full-app o dev local).
+   Para frontend en Vercel + API en Render, poner aquí
+   la URL de Render, ej: 'https://ponte-la-camiseta-kala.onrender.com'
+   ═══════════════════════════════════════════════ */
+const API_BASE = '';
+
+/* ═══════════════════════════════════════════════
    ESTADO GLOBAL
    ═══════════════════════════════════════════════ */
 const state = {
@@ -361,7 +369,7 @@ async function generateImage() {
 
     // 2 pedidos independientes (cada motor tiene su propio tiempo de ejecución).
     const reqOne = (provider, label) =>
-      fetch('/api/generate', {
+      fetch(`${API_BASE}/api/generate`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ ...base, provider }),
