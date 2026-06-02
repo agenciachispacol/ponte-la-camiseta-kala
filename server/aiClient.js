@@ -50,11 +50,12 @@ function geminiClient() {
 
 function openaiClient() {
   if (!_OpenAI) _OpenAI = require('openai');
-  // maxRetries bajo + timeout para que falle rápido en vez de colgarse.
+  // Sin reintentos (no duplica el tiempo) y timeout amplio: en Render no hay
+  // límite de 60s, así que la alta calidad alcanza a terminar.
   return new _OpenAI({
     apiKey:     process.env.OPENAI_API_KEY,
-    maxRetries: 1,
-    timeout:    50000,
+    maxRetries: 0,
+    timeout:    parseInt(process.env.OPENAI_TIMEOUT_MS, 10) || 165000,
   });
 }
 
