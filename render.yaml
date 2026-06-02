@@ -20,13 +20,14 @@ services:
         value: "false"
       - key: AI_PROVIDER
         value: gemini
-      # Sin límite de 60s → alta calidad en OpenAI
+      # Balance calidad/tiempo (Render no tiene límite de 60s)
       - key: GEN_TIMEOUT_MS
-        value: "180000"
+        value: "150000"
       - key: OPENAI_IMAGE_QUALITY
-        value: high
+        value: medium
       - key: OPENAI_IMAGE_SIZE
-        value: 1024x1536
+        value: 1024x1024
+      # input_fidelity high conserva la cara/logo (mejor parecido)
       - key: OPENAI_INPUT_FIDELITY
         value: high
       # Secretos: Render los pide al desplegar (no se guardan en el repo)
