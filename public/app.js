@@ -382,11 +382,12 @@ async function generateImage() {
       })
       .catch(err => { console.warn(`[APP] ${label} falló:`, err.message); return { label, error: true }; });
 
-    // Secuencial (no en paralelo): la API de imagen encola pedidos simultáneos
-    // y el segundo se pasaría del límite. Uno tras otro, cada uno entra holgado.
-    const v1 = await reqOne('gemini', 'a', 'Opción 1');
-    const v2 = await reqOne('gemini', 'b', 'Opción 2');
-    const settled = [v1, v2];
+    // Opción 1 = Gemini, Opción 2 = OpenAI. Son APIs distintas → en paralelo
+    // no se encolan entre sí. (Requiere backend sin límite de 60s: Render.)
+    const settled = await Promise.all([
+      reqOne('gemini', undefined, 'Opción 1'),
+      reqOne('openai', undefined, 'Opción 2'),
+    ]);
 
     const versions = settled.filter(v => v.imageDataUrl || v.imageUrl);
     if (versions.length === 0) {
