@@ -410,11 +410,11 @@ async function generateImage() {
 let loadingTimer = null;
 
 const LOAD_STEPS = [
-  { id: 'lc-1', msg: 'Analizando tu rostro...',                                 pct: 12,  delay: 0    },
-  { id: 'lc-2', msg: 'Calculando complexión corporal...',                       pct: 25,  delay: 4000 },
-  { id: 'lc-3', msg: 'Creando la Opción 1...',                                  pct: 45,  delay: 9000 },
-  { id: 'lc-4', msg: 'Creando la Opción 2...',                                  pct: 75,  delay: 24000},
-  { id: 'lc-5', msg: 'Finalizando en alta resolución...',                       pct: 93,  delay: 38000},
+  { id: 'lc-1', msg: 'Analizando tu rostro...',                                 pct: 10,  delay: 0    },
+  { id: 'lc-2', msg: 'Calculando complexión corporal...',                       pct: 22,  delay: 6000 },
+  { id: 'lc-3', msg: 'Creando tus 2 versiones del retrato...',                  pct: 45,  delay: 15000},
+  { id: 'lc-4', msg: 'Poniéndote la camiseta en el estadio...',                 pct: 72,  delay: 34000},
+  { id: 'lc-5', msg: 'Finalizando en alta resolución...',                       pct: 92,  delay: 54000},
 ];
 
 function startLoadingAnimation() {
