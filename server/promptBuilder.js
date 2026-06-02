@@ -14,34 +14,27 @@ const PROMPT_BASE = `
 TASK: This is a PHOTO EDIT, not a new portrait. Take the EXACT person shown in the FACE
 REFERENCE photo and place them in a football stadium wearing the KALA jersey.
 
-#1 RULE — IDENTITY LOCK (most important): The output face must be a NEAR-EXACT COPY of the
-person in the FACE REFERENCE photo — treat it almost like keeping the original face pixels.
-Replicate precisely: the exact face shape and bone structure, the exact eye shape, color and
-spacing (keep light/green/hazel eyes if they are light — do NOT make the eyes darker), the
-exact nose shape, the exact mouth and lips, the jawline and chin, the eyebrows, the skin tone
-and skin texture, any facial hair, moles, freckles or distinctive marks, the hairline and
-hairstyle, and the apparent age.
+#1 RULE — IDENTITY (keep the person EXACTLY, whoever they are): Reproduce the real person's
+face and body with maximum fidelity. This rule is UNIVERSAL — it applies to ANY person, of ANY
+body type, age, skin tone, gender or look. Copy EXACTLY, whatever the reference shows:
+- the exact face shape and width, and the exact amount of facial fat — keep thin faces thin and
+  heavy/round/chubby faces heavy and round (NEVER slim or chisel a fuller face);
+- the exact eye shape AND eye color — light or dark, never change it;
+- the exact nose, mouth, lips, jawline, chin, eyebrows, skin tone, texture and any moles/marks;
+- the exact hairstyle and hair length — short/buzzed/faded or long/curly, never add or remove
+  hair, never change the cut;
+- the exact facial hair (beard/goatee/stubble/none) and the person's real age and weight.
+NEVER beautify, slim, smooth, rejuvenate, symmetrize, age or idealize, and NEVER turn the
+person into a generic athlete or model. The output must be unmistakably the SAME real person —
+recognizable at a glance. Facial likeness is the #1 priority.
 
-CRITICAL — KEEP THE FACE WEIGHT AND FULLNESS: Reproduce the person's real facial fat and
-roundness EXACTLY. If the face is round, full, chubby or has fuller cheeks, a softer jawline,
-a double chin or a wider face, KEEP IT EXACTLY THAT WAY. NEVER slim the face, NEVER sharpen or
-chisel the jaw or cheekbones, NEVER make them look more athletic, fit, older or more handsome.
-A heavier, rounder real face must stay heavy and round. Keep them looking their real age and
-real weight.
+ROLE OF EACH REFERENCE IMAGE: The FACE REFERENCE image is the REAL PERSON — take ONLY the face
+and body from it. The JERSEY REFERENCE and BALL REFERENCE images are PRODUCT designs only —
+copy the jersey design/logo and the ball pattern from them, but do NOT take any face, head,
+hair, body or person from those product images.
 
-CRITICAL — KEEP THE EXACT HAIR: Match the hairstyle and hair length precisely. If the hair is
-very short, buzzed, shaved at the sides or faded, KEEP IT exactly that short — do NOT add
-length, curls, waves or volume. Match the exact hairline. Keep the same facial-hair style
-(beard/goatee/stubble) exactly as in the reference.
-
-It must be SO similar that a friend instantly recognizes them. DO NOT beautify, slim, smooth,
-rejuvenate, symmetrize, age or idealize the face, and DO NOT blend it with a generic athlete
-or model face. Facial likeness is the #1 priority — above pose, lighting, jersey and background.
-
-FRAMING: Close head-and-shoulders PORTRAIT (bust shot). The face is large and dominant,
-filling the upper part of the frame, perfectly sharp and in focus — this is essential for the
-likeness. We still see the KALA jersey on the shoulders and upper chest, and the ball held up
-beside the shoulder so it stays in this close frame.
+FRAMING: Chest-up shot. The face is large and sharp (key for the likeness), AND the KALA logo
+on the chest plus the ball are both clearly visible in the frame.
 
 SETTING: Packed nighttime football stadium, Colombia, dramatic stadium floodlights,
 electric green pitch in the background, crowd blurred in cool blue bokeh, subtle haze,
