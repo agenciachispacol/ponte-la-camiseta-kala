@@ -382,10 +382,11 @@ async function generateImage() {
       })
       .catch(err => { console.warn(`[APP] ${label} falló:`, err.message); return { label, error: true }; });
 
-    const settled = await Promise.all([
-      reqOne('gemini', 'a', 'Opción 1'),
-      reqOne('gemini', 'b', 'Opción 2'),
-    ]);
+    // Secuencial (no en paralelo): la API de imagen encola pedidos simultáneos
+    // y el segundo se pasaría del límite. Uno tras otro, cada uno entra holgado.
+    const v1 = await reqOne('gemini', 'a', 'Opción 1');
+    const v2 = await reqOne('gemini', 'b', 'Opción 2');
+    const settled = [v1, v2];
 
     const versions = settled.filter(v => v.imageDataUrl || v.imageUrl);
     if (versions.length === 0) {
@@ -408,11 +409,11 @@ async function generateImage() {
 let loadingTimer = null;
 
 const LOAD_STEPS = [
-  { id: 'lc-1', msg: 'Analizando tu rostro...',                                 pct: 15,  delay: 0    },
-  { id: 'lc-2', msg: 'Calculando complexión corporal...',                       pct: 35,  delay: 3500 },
-  { id: 'lc-3', msg: 'Construyendo prompt especializado KALA...',               pct: 55,  delay: 7000 },
-  { id: 'lc-4', msg: 'Creando tus 2 versiones del retrato...',                   pct: 80,  delay: 12000},
-  { id: 'lc-5', msg: 'Finalizando en alta resolución...',                       pct: 95,  delay: 22000},
+  { id: 'lc-1', msg: 'Analizando tu rostro...',                                 pct: 12,  delay: 0    },
+  { id: 'lc-2', msg: 'Calculando complexión corporal...',                       pct: 25,  delay: 4000 },
+  { id: 'lc-3', msg: 'Creando la Opción 1...',                                  pct: 45,  delay: 9000 },
+  { id: 'lc-4', msg: 'Creando la Opción 2...',                                  pct: 75,  delay: 24000},
+  { id: 'lc-5', msg: 'Finalizando en alta resolución...',                       pct: 93,  delay: 38000},
 ];
 
 function startLoadingAnimation() {
