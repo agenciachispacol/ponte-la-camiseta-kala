@@ -237,10 +237,11 @@ async function generateWithOpenAI(positivePrompt, faceImg) {
   // Intento 1: EDIT con la selfie + camiseta + balón como referencia, para
   // conservar identidad Y reproducir bien el logo/balón (no inventarlos).
   try {
-    // Selfie + camiseta (sin balón) → conserva cara y logo, más rápido.
+    // SOLO la selfie (como en ChatGPT: editar tu foto preserva tu cara).
+    // Mandar también la camiseta/balón confundía al modelo y re-inventaba la
+    // persona. La camiseta y el logo van descritos en el texto.
     const images = [];
-    if (faceImg)    images.push(await toFile(Buffer.from(faceImg.base64, 'base64'),  'selfie.jpg', { type: faceImg.mimeType || 'image/jpeg' }));
-    if (JERSEY_IMG) images.push(await toFile(Buffer.from(JERSEY_IMG.base64, 'base64'), 'jersey.jpg', { type: 'image/jpeg' }));
+    if (faceImg) images.push(await toFile(Buffer.from(faceImg.base64, 'base64'), 'selfie.jpg', { type: faceImg.mimeType || 'image/jpeg' }));
 
     if (images.length) {
       const editParams = { model: MODEL, image: images, prompt: oaiPrompt, size: SIZE, quality: QUAL };
