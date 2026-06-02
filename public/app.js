@@ -380,21 +380,19 @@ async function generateImage() {
         if (!d || !d.success) throw new Error(d && d.error ? d.error : 'fallo');
         return { label, imageDataUrl: d.imageDataUrl, imageUrl: d.imageUrl };
       })
-      .catch(err => { console.warn(`[APP] ${label} falló:`, err.message); return { label, error: true }; });
+      .catch(err => { console.warn(`[APP] ${label} falló:`, err.message); return { label, error: true, detail: err.message }; });
 
-    // Opción 1 = Gemini, Opción 2 = OpenAI. Son APIs distintas → en paralelo
-    // no se encolan entre sí. (Requiere backend sin límite de 60s: Render.)
+    // Opción 1 = Gemini, Opción 2 = OpenAI (APIs distintas → en paralelo).
     const settled = await Promise.all([
       reqOne('gemini', undefined, 'Opción 1'),
       reqOne('openai', undefined, 'Opción 2'),
     ]);
 
-    const versions = settled.filter(v => v.imageDataUrl || v.imageUrl);
-    if (versions.length === 0) {
+    if (!settled.some(v => v.imageDataUrl || v.imageUrl)) {
       throw new Error('No se generó ninguna versión.');
     }
 
-    finishLoadingAnimation(() => showResults(versions));
+    finishLoadingAnimation(() => showResults(settled));
 
   } catch (err) {
     console.error('[APP] Error:', err); // detalle técnico solo en consola
@@ -491,12 +489,23 @@ function showResults(versions) {
   const cont = document.getElementById('result-versions');
   cont.innerHTML = '';
 
-  const ok = versions.filter(v => v && (v.imageDataUrl || v.imageUrl));
-  if (ok.length === 0) return;
+  const multi = versions.length > 1;
 
-  ok.forEach((v, i) => {
+  versions.forEach((v) => {
     const url = v.imageDataUrl || v.imageUrl;
-    const label = ok.length > 1 ? `Opción ${i + 1}` : 'Tu retrato';
+    const label = multi ? v.label : 'Tu retrato';
+
+    // ── Versión que FALLÓ: tarjeta con el motivo (diagnóstico) ──
+    if (!url) {
+      const fail = document.createElement('div');
+      fail.className = 'version-card version-failed';
+      fail.innerHTML = `
+        <div class="version-label">${label}</div>
+        <p class="fail-note">⚠️ No se pudo generar esta versión en este intento.</p>
+        <p class="fail-detail">${String(v.detail || '').replace(/[<>]/g, '')}</p>`;
+      cont.appendChild(fail);
+      return;
+    }
 
     const card = document.createElement('div');
     card.className = 'version-card';

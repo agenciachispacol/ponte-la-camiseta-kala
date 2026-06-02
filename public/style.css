@@ -1256,6 +1256,21 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   text-align:     center;
 }
 
+.version-failed { border-style: dashed; }
+.fail-note {
+  font-size:   13px;
+  font-weight: 700;
+  color:       var(--white-70);
+  text-align:  center;
+}
+.fail-detail {
+  font-size:   11px;
+  color:       var(--white-40);
+  text-align:  center;
+  word-break:  break-word;
+  margin-top:  4px;
+}
+
 /* En pantallas anchas, las 2 versiones lado a lado */
 @media (min-width: 720px) {
   .result-versions { grid-template-columns: 1fr 1fr; }
