@@ -195,7 +195,7 @@ function processFile(file) {
 
   // Redimensionar a base64 (para enviar liviano al backend serverless)
   document.getElementById('btn-step1').disabled = true;
-  resizeToBase64(file, 1024).then(({ base64, mime }) => {
+  resizeToBase64(file, 1280).then(({ base64, mime }) => {
     state.selfieBase64 = base64;
     state.selfieMime   = mime;
     document.getElementById('btn-step1').disabled = false;
@@ -222,7 +222,7 @@ function resizeToBase64(file, maxDim) {
       const canvas = document.createElement('canvas');
       canvas.width = width; canvas.height = height;
       canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
       resolve({ base64: dataUrl.split(',')[1], mime: 'image/jpeg' });
     };
     img.onerror = reject;
