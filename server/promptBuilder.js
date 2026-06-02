@@ -14,16 +14,21 @@ const PROMPT_BASE = `
 TASK: This is a PHOTO EDIT, not a new portrait. Take the EXACT person shown in the FACE
 REFERENCE photo and place them in a football stadium wearing the KALA jersey.
 
-#1 RULE — IDENTITY LOCK: The face and identity MUST stay IDENTICAL to the FACE REFERENCE
-photo. Keep the same facial features, exact face shape and bone structure, same eyes, nose,
-mouth and jawline, same skin tone, same hair, same approximate age and the same person's
-look. The result must be unmistakably the SAME individual — as if this real person posed for
-the photo. DO NOT beautify, slim the face, change age, swap to a different or "ideal" face,
-or turn them into a model. Preserve their real, recognizable face above everything else.
+#1 RULE — IDENTITY LOCK (most important): The output face must be a NEAR-EXACT COPY of the
+person in the FACE REFERENCE photo — treat it almost like keeping the original face pixels.
+Replicate precisely: the exact face shape and bone structure, the exact eye shape, color and
+spacing, the exact nose shape, the exact mouth and lips, the jawline and chin, the eyebrows,
+the skin tone and skin texture, any facial hair, moles, freckles or distinctive marks, the
+hairline and hairstyle, and the apparent age and weight of the face. If the person wears
+glasses in the reference, keep the glasses. It must be SO similar that a friend instantly
+recognizes them. DO NOT beautify, slim, smooth, rejuvenate, symmetrize or idealize the face,
+and DO NOT blend it with a generic or model face. Facial likeness is the #1 priority — above
+pose, lighting, jersey and background.
 
-FRAMING: Upper-body / chest-up portrait. The head and face fill a large portion of the frame
-and are sharp, well lit and fully recognizable. The KALA jersey logo stays visible on the
-chest. The person holds the ball up near the chest or shoulder so it remains in frame.
+FRAMING: Close head-and-shoulders PORTRAIT (bust shot). The face is large and dominant,
+filling the upper part of the frame, perfectly sharp and in focus — this is essential for the
+likeness. We still see the KALA jersey on the shoulders and upper chest, and the ball held up
+beside the shoulder so it stays in this close frame.
 
 SETTING: Packed nighttime football stadium, Colombia, dramatic stadium floodlights,
 electric green pitch in the background, crowd blurred in cool blue bokeh, subtle haze,
@@ -56,10 +61,10 @@ shadows on the face. Apply the SAME subtle film grain and color grade over the e
 No hard edges or halo around the head or hair, no sticker/cut-out effect, no seams where the
 face meets the neck — the person must look genuinely photographed in that stadium.
 
-FINAL AND MOST IMPORTANT INSTRUCTION: The generated face MUST be the SAME person as the FACE
-REFERENCE image — copy their real face faithfully (same proportions, features and expression
-character), fully recognizable as that individual. Facial likeness to the reference photo
-takes priority over pose, lighting and style.
+FINAL AND MOST IMPORTANT INSTRUCTION: Before finishing, compare the generated face with the
+FACE REFERENCE photo — they MUST look like the SAME real person, near-identical. If in doubt,
+copy the reference face more closely. Facial likeness beats everything else (pose, lighting,
+jersey, ball, background). A perfect stadium photo with the wrong face is a FAILURE.
 `.trim();
 
 // ─────────────────────────────────────────────
