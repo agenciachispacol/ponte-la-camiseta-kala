@@ -237,17 +237,17 @@ async function generateWithOpenAI(positivePrompt, faceImg) {
   // Intento 1: EDIT con la selfie + camiseta + balón como referencia, para
   // conservar identidad Y reproducir bien el logo/balón (no inventarlos).
   try {
-    // Selfie + camiseta (sin balón, para no confundir). Con input_fidelity high
-    // gpt-image conserva la CARA de la selfie y el LOGO de la camiseta.
+    // SOLO la selfie. CONFIRMADO con pruebas: pasarle la camiseta como imagen
+    // hace que gpt-image re-invente la cara. Editando solo la selfie conserva
+    // la cara; la camiseta/logo/balón van por el texto (descripción reforzada).
     const images = [];
-    if (faceImg)    images.push(await toFile(Buffer.from(faceImg.base64, 'base64'),  'selfie.jpg', { type: faceImg.mimeType || 'image/jpeg' }));
-    if (JERSEY_IMG) images.push(await toFile(Buffer.from(JERSEY_IMG.base64, 'base64'), 'jersey.jpg', { type: 'image/jpeg' }));
+    if (faceImg) images.push(await toFile(Buffer.from(faceImg.base64, 'base64'), 'selfie.jpg', { type: faceImg.mimeType || 'image/jpeg' }));
 
     if (images.length) {
       const editParams = { model: MODEL, image: images, prompt: oaiPrompt, size: SIZE, quality: QUAL };
-      // input_fidelity 'high' = forma oficial de OpenAI para conservar caras y
-      // logos de las imágenes de entrada (cara de la selfie + logo de la camiseta).
-      if (process.env.OPENAI_INPUT_FIDELITY !== 'off') editParams.input_fidelity = 'high';
+      // input_fidelity high pega mucho la cara ("puesta"). Por defecto NO se usa
+      // (la cara igual se conserva al editar solo la selfie). Forzable con env.
+      if (process.env.OPENAI_INPUT_FIDELITY === 'high') editParams.input_fidelity = 'high';
       const res = await oai.images.edit(editParams);
       const img = res?.data?.[0];
       if (img?.b64_json) return { type: 'base64', data: img.b64_json, mimeType: 'image/png', model: MODEL };
