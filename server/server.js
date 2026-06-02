@@ -39,6 +39,7 @@ app.post('/api/generate', async (req, res) => {
       selfieMime:   req.body.selfieMime,
       mode:         req.body.mode,
       provider:     req.body.provider,
+      variant:      req.body.variant,
     });
     res.json({ success: true, ...result });
   } catch (err) {

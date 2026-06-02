@@ -367,12 +367,13 @@ async function generateImage() {
       peso:       state.peso,
     };
 
-    // 2 pedidos independientes (cada motor tiene su propio tiempo de ejecución).
-    const reqOne = (provider, label) =>
+    // 2 pedidos independientes con el mismo motor (Gemini) pero distinta
+    // variación de pose → 2 opciones distintas, rápidas y confiables en Vercel.
+    const reqOne = (provider, variant, label) =>
       fetch(`${API_BASE}/api/generate`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ ...base, provider }),
+        body:    JSON.stringify({ ...base, provider, variant }),
       })
       .then(r => r.json())
       .then(d => {
@@ -382,8 +383,8 @@ async function generateImage() {
       .catch(err => { console.warn(`[APP] ${label} falló:`, err.message); return { label, error: true }; });
 
     const settled = await Promise.all([
-      reqOne('gemini', 'Opción 1'),
-      reqOne('openai', 'Opción 2'),
+      reqOne('gemini', 'a', 'Opción 1'),
+      reqOne('gemini', 'b', 'Opción 2'),
     ]);
 
     const versions = settled.filter(v => v.imageDataUrl || v.imageUrl);

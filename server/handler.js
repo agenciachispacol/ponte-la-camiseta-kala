@@ -13,6 +13,14 @@ const { generatePortrait, generateForProvider, withTimeout } = require('./aiClie
 // con GEN_TIMEOUT_MS para permitir alta calidad.
 const PROVIDER_TIMEOUT_MS = parseInt(process.env.GEN_TIMEOUT_MS, 10) || 58000;
 
+// Variaciones de pose/encuadre para tener 2 opciones distintas con el mismo motor.
+const VARIANTS = {
+  a: 'VERSION A POSE: Front-facing, looking directly into the camera, calm confident expression, ' +
+     'the ball held with both hands at chest height. Centered, symmetric composition.',
+  b: 'VERSION B POSE: Slight three-quarter body angle, looking just off to the side, a warm proud smile, ' +
+     'the ball resting on one shoulder, a more relaxed dynamic stance. Slightly different stadium angle and lighting.',
+};
+
 /** Convierte un resultado de IA (o fallo) en una "versión" para el frontend. */
 function toVersion(label, provider, settled) {
   if (settled.status === 'fulfilled') {
@@ -107,6 +115,10 @@ async function handleGenerate(input) {
   if (input.provider === 'gemini' || input.provider === 'openai') {
     let prompt = positivePrompt;
     if (negativePrompt) prompt += `\n\nAVOID: ${negativePrompt}.`;
+    // Variación de pose/ángulo para que las 2 opciones se vean distintas.
+    if (input.variant && VARIANTS[input.variant]) {
+      prompt += `\n\n${VARIANTS[input.variant]}`;
+    }
     const result = await withTimeout(
       generateForProvider(input.provider, prompt, faceImage),
       PROVIDER_TIMEOUT_MS,
