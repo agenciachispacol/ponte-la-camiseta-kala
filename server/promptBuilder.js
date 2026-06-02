@@ -77,6 +77,31 @@ jersey, ball, background). A perfect stadium photo with the wrong face is a FAIL
 `.trim();
 
 // ─────────────────────────────────────────────
+// PROMPT para GEMINI (nano banana) — limpio y directo.
+// Gemini recibe 3 imágenes de referencia (cara, camiseta, balón), así que
+// el texto se apoya en ellas en vez de sobre-describir todo.
+// ─────────────────────────────────────────────
+const GEMINI_PROMPT_BASE = `
+Ultra-realistic photo of the SAME person from the FIRST reference image (their face), standing
+in a packed nighttime football stadium with floodlights and a green pitch.
+
+KEEP THE FACE IDENTICAL to that first reference image: same face shape and width, same amount of
+facial fat (do NOT slim a full/round face), same eyes and eye color, same nose, mouth, jawline,
+eyebrows, skin tone, beard/stubble and the same hairstyle and hair length. It must clearly be
+the SAME real person — never beautified, slimmed, aged or turned into a model.
+
+Dress them in the WHITE KALA jersey from the SECOND reference image (navy "kala" wordmark across
+the chest, small navy "k" on the upper-right) and have them hold the colorful ball from the
+THIRD reference image. Copy the jersey and ball designs exactly from those images.
+
+{SECCION_BODY}
+
+Chest-up shot: the face is large and sharp, and the KALA logo plus the ball are visible.
+Cinematic stadium lighting that matches across face, body and background (no pasted/cut-out
+look). Photoreal skin with natural texture. Confident, proud, natural stance.
+`.trim();
+
+// ─────────────────────────────────────────────
 // NEGATIVOS BASE (siempre incluidos)
 // ─────────────────────────────────────────────
 const NEGATIVE_BASE = [
@@ -211,11 +236,14 @@ function determinarComplexion(genero, altura, peso) {
  * @param {number} params.peso     kg
  * @returns {{ positivePrompt: string, negativePrompt: string, metadata: object }}
  */
-function construirPromptFinal({ genero, altura, peso }) {
+function construirPromptFinal({ genero, altura, peso, provider }) {
   const { bodyDescription, negativeAddons, label, imc } = determinarComplexion(genero, altura, peso);
 
   const seccionBody = `BODY: ${bodyDescription}`;
-  const positivePrompt = PROMPT_BASE.replace('{SECCION_BODY}', seccionBody);
+  // Gemini usa un prompt limpio (se apoya en las 3 imágenes); OpenAI usa el
+  // detallado (edita solo la selfie, sin imágenes de camiseta/balón).
+  const base = provider === 'gemini' ? GEMINI_PROMPT_BASE : PROMPT_BASE;
+  const positivePrompt = base.replace('{SECCION_BODY}', seccionBody);
   const negativePrompt = [...NEGATIVE_BASE, ...negativeAddons].join(', ');
 
   return {

@@ -113,8 +113,10 @@ async function handleGenerate(input) {
 
   // ── Un solo proveedor específico (cada pedido = su propia función de 60s) ──
   if (input.provider === 'gemini' || input.provider === 'openai') {
-    let prompt = positivePrompt;
-    if (negativePrompt) prompt += `\n\nAVOID: ${negativePrompt}.`;
+    // Prompt específico por motor (Gemini limpio / OpenAI detallado).
+    const built = construirPromptFinal({ genero, altura, peso, provider: input.provider });
+    let prompt = built.positivePrompt;
+    if (built.negativePrompt) prompt += `\n\nAVOID: ${built.negativePrompt}.`;
     // Variación de pose/ángulo para que las 2 opciones se vean distintas.
     if (input.variant && VARIANTS[input.variant]) {
       prompt += `\n\n${VARIANTS[input.variant]}`;
