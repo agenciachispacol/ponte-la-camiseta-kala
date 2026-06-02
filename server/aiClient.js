@@ -272,13 +272,65 @@ async function generateWithOpenAI(positivePrompt, faceImg) {
 }
 
 // ─────────────────────────────────────────────
+// FLUX.2 [pro] — Black Forest Labs
+// Multi-referencia: image 1 = selfie (persona), image 2 = camiseta.
+// Conserva la cara Y usa el logo exacto de la camiseta.
+// ─────────────────────────────────────────────
+function _sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function generateWithFlux(prompt, faceImg, jerseyImg) {
+  const KEY = process.env.BFL_API_KEY;
+  if (!KEY) throw new Error('Falta BFL_API_KEY');
+
+  const body = {
+    prompt,
+    input_image:  faceImg.base64,        // image 1 = persona
+    aspect_ratio: process.env.FLUX_ASPECT || '3:4',
+    output_format: 'jpeg',
+  };
+  if (jerseyImg) body.input_image_2 = jerseyImg.base64; // image 2 = camiseta
+
+  const create = await fetch('https://api.bfl.ai/v1/flux-2-pro-preview', {
+    method:  'POST',
+    headers: { 'x-key': KEY, 'Content-Type': 'application/json' },
+    body:    JSON.stringify(body),
+  });
+  if (!create.ok) {
+    const t = await create.text();
+    throw new Error(`flux create ${create.status}: ${t.slice(0, 140)}`);
+  }
+  const cj = await create.json();
+  if (!cj.polling_url) throw new Error('flux: sin polling_url');
+
+  // Polling hasta que esté lista (o timeout)
+  const deadline = Date.now() + (parseInt(process.env.FLUX_TIMEOUT_MS, 10) || 110000);
+  while (Date.now() < deadline) {
+    await _sleep(2500);
+    const pr = await fetch(cj.polling_url, { headers: { 'x-key': KEY } });
+    const pj = await pr.json();
+    if (pj.status === 'Ready') {
+      const url = pj.result && pj.result.sample;
+      if (!url) throw new Error('flux: respuesta sin imagen');
+      const img = await fetch(url);
+      const buf = Buffer.from(await img.arrayBuffer());
+      return { type: 'base64', data: buf.toString('base64'), mimeType: 'image/jpeg', model: 'flux-2-pro' };
+    }
+    if (['Error', 'Failed', 'Content Moderated', 'Request Moderated'].includes(pj.status)) {
+      throw new Error(`flux: ${pj.status}`);
+    }
+  }
+  throw new Error('flux: timeout');
+}
+
+// ─────────────────────────────────────────────
 // Genera con UN proveedor concreto (para comparación A/B).
-// @param {'gemini'|'openai'} provider
+// @param {'gemini'|'openai'|'flux'} provider
 // @param {string} prompt  prompt completo (ya incluye AVOID)
 // @param {object} faceImage { base64, mimeType }
 // ─────────────────────────────────────────────
 async function generateForProvider(provider, prompt, faceImage) {
   if (provider === 'openai') return generateWithOpenAI(prompt, faceImage);
+  if (provider === 'flux')   return generateWithFlux(prompt, faceImage, JERSEY_IMG);
   return generateWithGeminiChain(prompt, faceImage);
 }
 

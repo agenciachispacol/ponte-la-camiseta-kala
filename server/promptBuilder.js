@@ -108,6 +108,30 @@ stance.
 `.trim();
 
 // ─────────────────────────────────────────────
+// PROMPT para FLUX.2 — multi-referencia.
+// image 1 = persona (selfie), image 2 = camiseta KALA.
+// ─────────────────────────────────────────────
+const FLUX_PROMPT_BASE = `
+Photorealistic photograph. Take the person from image 1 and keep their face EXACTLY — same face
+shape and width, same facial fat (do not slim a full/round face), same eyes and eye color, same
+nose, mouth, jawline, eyebrows, skin tone, beard/stubble, and the same hairstyle and hair
+length. It must clearly be the SAME real person, never beautified or turned into a model.
+
+Dress this person in the white soccer jersey shown in image 2 — copy that jersey and its logo
+EXACTLY (white jersey, navy-blue "kala" wordmark across the chest, small navy "k" on the
+upper-right, V-neck with navy trim). Place them in a packed nighttime football stadium with
+bright floodlights and a green pitch, holding a colorful soccer ball with red, blue and green
+panels.
+
+{SECCION_BODY}
+
+Waist-up shot at a natural distance: the face is clearly recognizable, the KALA logo and the
+ball are visible, the body looks natural and proportionate (correct shoulders, neck and torso,
+no distortion). Cinematic stadium lighting consistent across face, body and background — one
+single cohesive real photograph, not a collage.
+`.trim();
+
+// ─────────────────────────────────────────────
 // NEGATIVOS BASE (siempre incluidos)
 // ─────────────────────────────────────────────
 const NEGATIVE_BASE = [
@@ -248,7 +272,9 @@ function construirPromptFinal({ genero, altura, peso, provider }) {
   const seccionBody = `BODY: ${bodyDescription}`;
   // Gemini usa un prompt limpio (se apoya en las 3 imágenes); OpenAI usa el
   // detallado (edita solo la selfie, sin imágenes de camiseta/balón).
-  const base = provider === 'gemini' ? GEMINI_PROMPT_BASE : PROMPT_BASE;
+  const base = provider === 'gemini' ? GEMINI_PROMPT_BASE
+             : provider === 'flux'   ? FLUX_PROMPT_BASE
+             : PROMPT_BASE;
   const positivePrompt = base.replace('{SECCION_BODY}', seccionBody);
   const negativePrompt = [...NEGATIVE_BASE, ...negativeAddons].join(', ');
 

@@ -13,6 +13,7 @@ module.exports = (req, res) => {
     provider:  process.env.AI_PROVIDER || 'gemini',
     hasGemini: !!process.env.GEMINI_API_KEY,
     hasOpenAI: !!process.env.OPENAI_API_KEY,
+    hasFlux:   !!process.env.BFL_API_KEY,
     time:      new Date().toISOString(),
   });
 };
