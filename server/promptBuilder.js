@@ -96,9 +96,15 @@ THIRD reference image. Copy the jersey and ball designs exactly from those image
 
 {SECCION_BODY}
 
-Chest-up shot: the face is large and sharp, and the KALA logo plus the ball are visible.
-Cinematic stadium lighting that matches across face, body and background (no pasted/cut-out
-look). Photoreal skin with natural texture. Confident, proud, natural stance.
+Natural, anatomically-correct body: realistic shoulders, neck and torso that connect smoothly
+to the head and match the person's real build — NO distorted, shrunken, oversized, twisted or
+pasted-looking body, no weird neck or floating head. The head sits naturally on the shoulders.
+
+Waist-up shot at a natural distance (not too zoomed): the face is clearly recognizable, the
+KALA logo on the chest and the ball are visible, and the body looks normal and proportionate.
+Cinematic stadium lighting that matches across face, body and background (one cohesive real
+photo, no pasted/cut-out look). Photoreal skin with natural texture. Confident, proud, natural
+stance.
 `.trim();
 
 // ─────────────────────────────────────────────
