@@ -328,9 +328,52 @@ async function generateWithFlux(prompt, faceImg, jerseyImg) {
 // @param {string} prompt  prompt completo (ya incluye AVOID)
 // @param {object} faceImage { base64, mimeType }
 // ─────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// HÍBRIDO — base Gemini (logo/escena exactos) + edit OpenAI que corrige
+// SOLO la cara con la selfie. Busca cara real + logo exacto, gratis.
+// ─────────────────────────────────────────────
+async function generateHybrid(prompt, faceImage) {
+  // 1) Base con Gemini: logo/camiseta/balón/escena exactos
+  const base = await generateWithGeminiChain(prompt, faceImage);
+  if (base.type !== 'base64') return base; // por si acaso
+
+  // 2) OpenAI edit: reemplaza SOLO la cara por la de la selfie
+  const oai = openaiClient();
+  const { toFile } = require('openai');
+  const baseFile   = await toFile(Buffer.from(base.data, 'base64'),        'base.png',   { type: base.mimeType || 'image/png' });
+  const selfieFile = await toFile(Buffer.from(faceImage.base64, 'base64'), 'selfie.jpg', { type: faceImage.mimeType || 'image/jpeg' });
+
+  const editPrompt =
+    'Image 1 is a finished photo of a person wearing a white KALA soccer jersey in a stadium. ' +
+    'Replace ONLY the face and head of that person with the EXACT face of the person in image 2: ' +
+    'same facial features, exact face shape and width, same facial fullness (do not slim), same eyes ' +
+    'and eye color, nose, mouth, jawline, skin tone, beard/stubble and the same hairstyle and hair ' +
+    'length. Keep EVERYTHING ELSE of image 1 identical — the white KALA jersey and its navy logo, the ' +
+    'body, pose, hands, the colorful ball, the stadium and the lighting must not change. Blend the new ' +
+    'face seamlessly with matching skin tone and lighting; it must look like one real photograph.';
+
+  try {
+    const res = await oai.images.edit({
+      model:          process.env.OPENAI_IMAGE_MODEL || 'gpt-image-2',
+      image:          [baseFile, selfieFile],
+      prompt:         editPrompt,
+      size:           '1024x1536',
+      quality:        process.env.OPENAI_IMAGE_QUALITY || 'medium',
+      input_fidelity: 'high',
+    });
+    const img = res?.data?.[0];
+    if (img?.b64_json) return { type: 'base64', data: img.b64_json, mimeType: 'image/png', model: 'hybrid(gemini+gpt-image-2)' };
+    if (img?.url)      return { type: 'url', url: img.url, model: 'hybrid(gemini+gpt-image-2)' };
+  } catch (err) {
+    console.warn('[AI] híbrido: edit de cara falló, devuelvo base Gemini:', err.message);
+  }
+  return base; // si el edit falla, al menos devuelve la base Gemini
+}
+
 async function generateForProvider(provider, prompt, faceImage) {
   if (provider === 'openai') return generateWithOpenAI(prompt, faceImage);
   if (provider === 'flux')   return generateWithFlux(prompt, faceImage, JERSEY_IMG);
+  if (provider === 'hybrid') return generateHybrid(prompt, faceImage);
   return generateWithGeminiChain(prompt, faceImage);
 }
 

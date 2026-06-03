@@ -267,7 +267,7 @@ function construirPromptFinal({ genero, altura, peso, provider }) {
   const seccionBody = `BODY: ${bodyDescription}`;
   // Gemini usa un prompt limpio (se apoya en las 3 imágenes); OpenAI usa el
   // detallado (edita solo la selfie, sin imágenes de camiseta/balón).
-  const base = provider === 'gemini' ? GEMINI_PROMPT_BASE
+  const base = (provider === 'gemini' || provider === 'hybrid') ? GEMINI_PROMPT_BASE
              : provider === 'flux'   ? FLUX_PROMPT_BASE
              : PROMPT_BASE;
   const positivePrompt = base.replace('{SECCION_BODY}', seccionBody);

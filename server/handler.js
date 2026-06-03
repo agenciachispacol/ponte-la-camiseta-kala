@@ -112,7 +112,7 @@ async function handleGenerate(input) {
   }
 
   // ── Un solo proveedor específico (cada pedido = su propia función) ──
-  if (['gemini', 'openai', 'flux'].includes(input.provider)) {
+  if (['gemini', 'openai', 'flux', 'hybrid'].includes(input.provider)) {
     // Prompt específico por motor (Gemini limpio / OpenAI detallado).
     const built = construirPromptFinal({ genero, altura, peso, provider: input.provider });
     let prompt = built.positivePrompt;
