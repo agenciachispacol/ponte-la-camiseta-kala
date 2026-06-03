@@ -821,10 +821,35 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
 }
 
 .field-val-badge {
-  font-size:   16px;
-  font-weight: 800;
-  color:       var(--gold);
+  display:       inline-flex;
+  align-items:   baseline;
+  gap:           3px;
+  font-size:     16px;
+  font-weight:   800;
+  color:         var(--gold);
+  background:    rgba(20,111,214,0.10);
+  border:        1px solid rgba(20,111,214,0.30);
+  border-radius: 8px;
+  padding:       4px 8px;
 }
+
+/* Input numérico editable dentro del badge */
+.val-num {
+  width:        3.2em;
+  border:       none;
+  background:   transparent;
+  color:        var(--gold);
+  font-family:  var(--font);
+  font-size:    16px;
+  font-weight:  800;
+  text-align:   right;
+  padding:      0;
+  -moz-appearance: textfield;
+}
+.val-num:focus { outline: none; }
+.val-num::-webkit-outer-spin-button,
+.val-num::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.val-unit { font-size: 13px; font-weight: 700; color: var(--gold-light); }
 
 /* Gender toggle */
 .gender-toggle {

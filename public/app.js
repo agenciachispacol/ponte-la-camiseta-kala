@@ -308,6 +308,10 @@ function applyRange(sliderId, range) {
   slider.min   = range.min;
   slider.max   = range.max;
   slider.value = range.val;
+  // Espeja límites/valor en el input numérico editable.
+  const inputId = sliderId === 'slider-altura' ? 'val-altura' : 'val-peso';
+  const input = document.getElementById(inputId);
+  if (input) { input.min = range.min; input.max = range.max; input.value = range.val; }
   const ends = slider.closest('.field-block')?.querySelector('.slider-ends');
   if (ends) {
     const unit = sliderId === 'slider-altura' ? 'cm' : 'kg';
@@ -345,24 +349,69 @@ function acceptPrivacy() {
 /* ═══════════════════════════════════════════════
    SLIDERS
    ═══════════════════════════════════════════════ */
-function syncSlider(sliderId, labelId, unit) {
+// El slider mueve el valor → refleja en el input (sin pelear si lo están escribiendo).
+function syncSlider(sliderId, inputId /*, unit */) {
   const slider = document.getElementById(sliderId);
-  const label  = document.getElementById(labelId);
-  if (!slider || !label) return;
+  const input  = document.getElementById(inputId);
+  if (!slider) return;
 
-  const val = parseInt(slider.value);
-  label.textContent = `${val} ${unit}`;
+  const val = parseInt(slider.value, 10);
+  if (input && document.activeElement !== input) input.value = val;
 
-  // Actualizar estado
   if (sliderId === 'slider-altura') state.altura = val;
   if (sliderId === 'slider-peso')   state.peso   = val;
 
-  // Actualizar fill visual (webkit)
+  paintSlider(slider);
+}
+
+/** Pinta el "fill" del slider según su valor actual. */
+function paintSlider(slider) {
   const min = parseFloat(slider.min);
   const max = parseFloat(slider.max);
-  const pct = ((val - min) / (max - min)) * 100;
+  const pct = ((parseFloat(slider.value) - min) / (max - min)) * 100;
   slider.style.setProperty('--pct', pct + '%');
   slider.style.background = `linear-gradient(to right, var(--gold) ${pct}%, rgba(255,255,255,0.1) ${pct}%)`;
+}
+
+// El usuario escribe en el input → mueve el slider y el estado (sin reescribir lo que teclea).
+function onValInput(sliderId, inputId) {
+  const slider = document.getElementById(sliderId);
+  const input  = document.getElementById(inputId);
+  if (!slider || !input) return;
+
+  let v = parseInt(input.value, 10);
+  if (isNaN(v)) return; // lo dejamos seguir escribiendo
+
+  const min = parseFloat(slider.min);
+  const max = parseFloat(slider.max);
+  v = Math.min(max, Math.max(min, v));
+  slider.value = v;
+
+  if (sliderId === 'slider-altura') state.altura = v;
+  if (sliderId === 'slider-peso')   state.peso   = v;
+
+  paintSlider(slider);
+  updateComplexion();
+}
+
+// Al salir del input (blur): normaliza el número mostrado a los límites válidos.
+function onValChange(sliderId, inputId) {
+  const slider = document.getElementById(sliderId);
+  const input  = document.getElementById(inputId);
+  if (!slider || !input) return;
+
+  let v = parseInt(input.value, 10);
+  const min = parseFloat(slider.min);
+  const max = parseFloat(slider.max);
+  if (isNaN(v)) v = parseInt(slider.value, 10);
+  v = Math.min(max, Math.max(min, v));
+
+  input.value  = v;
+  slider.value = v;
+  if (sliderId === 'slider-altura') state.altura = v;
+  if (sliderId === 'slider-peso')   state.peso   = v;
+  paintSlider(slider);
+  updateComplexion();
 }
 
 /* ═══════════════════════════════════════════════
