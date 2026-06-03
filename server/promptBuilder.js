@@ -90,7 +90,7 @@ Follow this structured brief and output ONE photorealistic photograph:
   "outfit": "Dress the person in the white KALA soccer jersey from image 2. Copy its design and logo EXACTLY: clean white jersey, navy-blue 'kala' wordmark across the chest, small navy 'k' on the upper-right chest, V-neck with thin navy trim.",
   "prop": "The person holds the colorful soccer ball from image 3 (white with red, blue and green panels).",
   "body": "IMPORTANT — build the torso, shoulders, neck, chest and arms to CLEARLY MATCH this described build: a heavy/corpulent/curvy build must look visibly broad, thick and full (wider torso, fuller neck, bigger arms); a slim build must look slim and narrow; an athletic build moderate. Do NOT default everyone to a fit/athletic player body. The build: {SECCION_BODY}",
-  "anatomy": "Natural, correct body that matches the build above: realistic shoulders, neck and torso connected smoothly to the head; no distorted, shrunken, oversized or floating-head look.",
+  "anatomy": "Natural, anatomically-correct body with CORRECT human proportions. The head must be in natural proportion to the body — NOT small relative to the shoulders; neck and shoulders connect smoothly to the head, no distorted, shrunken, oversized or floating-head look. Shoulder width MUST match the person's GENDER: a woman has clearly NARROWER shoulders and a slimmer, feminine frame and waist — never give a woman a broad, square, boxy or masculine torso; a man is broader. The jersey drapes naturally over the real body shape (not oversized, boxy or balloon-like). Natural hands with the correct number of fingers holding the ball.",
   "framing": "Chest-up shot. The face is LARGE, sharp and clearly recognizable (most important); the KALA chest logo and the ball stay visible.",
   "setting": "packed nighttime football stadium, bright floodlights, green pitch, deep blue-black sky",
   "lighting": "Cinematic stadium light matched across face, body and background. ONE single cohesive real photograph, no pasted or cut-out look, no halo around the head.",
@@ -236,9 +236,13 @@ function determinarComplexion(genero, altura, peso) {
 
   const tier = tiers.find(t => imc < t.max) || tiers[tiers.length - 1];
 
+  const shoulders = sexo === 'Female'
+    ? 'Narrow, feminine shoulders and a slimmer frame with a natural waist (NOT broad or boxy).'
+    : 'Broader male shoulders and frame.';
   const bodyDescription =
     `${sexo}, ${altura}cm tall, ${peso}kg (BMI ${imc.toFixed(1)}), ${frame}. ` +
-    `${tier.desc} Real, authentic ${sexo.toLowerCase()} body proportions — not idealized.`;
+    `${tier.desc} ${shoulders} Natural head-to-body proportion. ` +
+    `Real, authentic ${sexo.toLowerCase()} body proportions — not idealized.`;
 
   return {
     bodyDescription,
