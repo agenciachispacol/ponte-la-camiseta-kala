@@ -205,23 +205,48 @@ function processFile(file) {
 }
 
 /**
- * Redimensiona una imagen a un lado máximo y la devuelve como base64 JPEG.
- * Mantiene el payload bajo el límite de Vercel (~4.5MB) y acelera la subida.
+ * Prepara la selfie: detecta la cara y recorta alrededor (cara + pelo +
+ * hombros) para que ocupe ~40-50% del cuadro (mejor parecido), luego
+ * redimensiona y devuelve base64 JPEG. Si el navegador no soporta detección
+ * de caras, usa la imagen completa (respaldo sin riesgo).
  */
 function resizeToBase64(file, maxDim) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
-    img.onload = () => {
+    img.onload = async () => {
       URL.revokeObjectURL(url);
-      let { width, height } = img;
-      if (width > maxDim || height > maxDim) {
-        if (width >= height) { height = Math.round(height * maxDim / width); width = maxDim; }
-        else                 { width  = Math.round(width  * maxDim / height); height = maxDim; }
+
+      // Región de origen (por defecto, imagen completa)
+      let sx = 0, sy = 0, sw = img.width, sh = img.height;
+
+      // Intentar recortar a la cara (si el navegador lo permite)
+      try {
+        if ('FaceDetector' in window) {
+          const fd = new window.FaceDetector({ maxDetectedFaces: 1, fastMode: true });
+          const faces = await fd.detect(img);
+          if (faces && faces[0] && faces[0].boundingBox) {
+            const b  = faces[0].boundingBox;
+            const cx = b.x + b.width / 2;
+            const cy = b.y + b.height / 2 + b.height * 0.15; // bajar un poco para incluir mentón/hombros
+            const size = Math.max(b.width, b.height) * 2.4;   // margen: pelo, mentón, hombros
+            sw = sh = Math.min(size, img.width, img.height);
+            sx = Math.max(0, Math.min(cx - sw / 2, img.width  - sw));
+            sy = Math.max(0, Math.min(cy - sh / 2, img.height - sh));
+          }
+        }
+      } catch (_) { /* sin detección → imagen completa */ }
+
+      // Escalar el recorte a maxDim
+      let dw = sw, dh = sh;
+      if (dw > maxDim || dh > maxDim) {
+        if (dw >= dh) { dh = Math.round(dh * maxDim / dw); dw = maxDim; }
+        else          { dw = Math.round(dw * maxDim / dh); dh = maxDim; }
       }
+
       const canvas = document.createElement('canvas');
-      canvas.width = width; canvas.height = height;
-      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      canvas.width = dw; canvas.height = dh;
+      canvas.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, dw, dh);
       const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
       resolve({ base64: dataUrl.split(',')[1], mime: 'image/jpeg' });
     };
