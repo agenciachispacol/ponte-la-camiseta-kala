@@ -47,6 +47,8 @@ navy-blue letters, write the brand name spelled exactly "kala" (k-a-l-a) — cle
 correctly spelled, no other words. A small navy-blue lowercase "k" logo sits on the upper-RIGHT
 chest. V-neck collar with a thin navy-blue trim, and a thin navy trim on the sleeve cuffs.
 The rest of the jersey is clean white with subtle tonal texture. Realistic fabric, natural fit.
+The jersey is FULL-LENGTH and fully covers the torso and stomach down to the hips/waistband — it is
+NOT a crop top, never rolled up, tucked up or lifted, with no exposed midriff, belly or navel.
 
 BALL: The person holds ONE soccer ball in frame (at chest height or under the arm) — a modern
 match ball with a WHITE base covered in vivid multicolor geometric panels in RED, BLUE and
@@ -87,7 +89,7 @@ Follow this structured brief and output ONE photorealistic photograph:
   "task": "Create a single realistic photo by compositing the 3 reference images.",
   "subject": "the exact real person shown in image 1",
   "identity_lock": "TOP PRIORITY. Copy the face from image 1 EXACTLY, as if reusing that same photo. Do NOT redraw, restyle, beautify, slim, age, symmetrize or average the features. CRUCIAL: match the EXACT WIDTH of the face and the FULLNESS of the cheeks, chin and jaw — if the reference face is wide, round, full or chubby, the output face must be EQUALLY wide and full, never narrower, slimmer, more refined or more defined. Keep the same face shape, the same eyes and exact eye color, the same nose, mouth, lips, jawline, chin, eyebrows, skin tone and marks, the same beard/stubble, and the same hairstyle and hair length. It must be unmistakably the SAME person, recognizable at a glance, at their real age and weight.",
-  "outfit": "Dress the person in the white KALA soccer jersey from image 2. Copy its design and logo EXACTLY: clean white jersey, navy-blue 'kala' wordmark across the chest, small navy 'k' on the upper-right chest, V-neck with thin navy trim.",
+  "outfit": "Dress the person in the white KALA soccer jersey from image 2. Copy its design and logo EXACTLY: clean white jersey, dark navy-blue (#062951) 'kala' wordmark across the chest, small navy 'k' on the upper-right chest, V-neck with thin navy trim. The jersey is FULL-LENGTH and fully covers the torso and stomach down to the hips/waistband — it is NOT a crop top, never rolled up, tucked up or lifted, with no exposed midriff, belly or navel.",
   "prop": "The person holds the colorful soccer ball from image 3 (white with red, blue and green panels).",
   "body": "IMPORTANT — build the torso, shoulders, neck, chest and arms to CLEARLY MATCH this described build: a heavy/corpulent/curvy build must look visibly broad, thick and full (wider torso, fuller neck, bigger arms); a slim build must look slim and narrow; an athletic build moderate. Do NOT default everyone to a fit/athletic player body. The build: {SECCION_BODY}",
   "anatomy": "Natural, anatomically-correct body with CORRECT human proportions. The head must be in natural proportion to the body — NOT small relative to the shoulders; neck and shoulders connect smoothly to the head, no distorted, shrunken, oversized or floating-head look. Shoulder width MUST match the person's GENDER: a woman has clearly NARROWER shoulders and a slimmer, feminine frame and waist — never give a woman a broad, square, boxy or masculine torso; a man is broader. The jersey drapes naturally over the real body shape (not oversized, boxy or balloon-like). Natural hands with the correct number of fingers holding the ball.",
@@ -114,8 +116,8 @@ const FLUX_PROMPT_BASE = `
     "source": "image 2",
     "item": "clean white short-sleeve soccer jersey",
     "logo": "navy-blue lowercase 'kala' wordmark large across the chest, plus a small navy 'k' on the upper-right chest, V-neck with thin navy trim",
-    "logo_color": "#1B2A4A",
-    "instruction": "copy the jersey design and the logo from image 2 exactly"
+    "logo_color": "#062951",
+    "instruction": "copy the jersey design and the logo from image 2 exactly. The jersey is full-length and fully covers the torso and stomach down to the hips/waistband — NOT a crop top, never rolled or lifted up, no exposed midriff, belly or navel"
   },
   "prop": "the person holds a colorful soccer ball, white with red, blue and green geometric panels, at chest height or under the arm",
   "scene": "packed nighttime football stadium with bright floodlights, a green pitch and a deep blue-black sky",
@@ -145,6 +147,8 @@ const NEGATIVE_BASE = [
   'watermark', 'text overlay', 'signature', 'logo overlay',
   'generic jersey', 'wrong jersey', 'wrong logo', 'misspelled logo',
   'yellow jersey', 'black jersey', 'striped jersey', 'plain ball', 'wrong ball colors',
+  'crop top', 'cropped jersey', 'rolled-up shirt', 'lifted shirt', 'tucked-up shirt',
+  'exposed midriff', 'bare belly', 'exposed navel', 'exposed stomach', 'short shirt',
   'overexposed', 'underexposed', 'flat lighting', 'studio background',
   'white background', 'cut out background', 'fake stadium',
 ];
@@ -222,20 +226,85 @@ const TIERS_MUJER = [
     neg: ['slim', 'thin', 'average build', 'athletic', 'model-like', 'fit'] },
 ];
 
+// ─────────────────────────────────────────────
+// GRUPOS DE EDAD
+// El cuerpo de niños/bebés NO se rige por el IMC adulto: lo decide la edad.
+// 'adulto' mantiene el comportamiento por IMC de siempre.
+// ─────────────────────────────────────────────
+const AGE_INFO = {
+  bebe: {
+    kind: 'child', label: 'Bebé (0-3)', en: 'baby/toddler, about 1 to 3 years old',
+    body: 'Render a TODDLER body with authentic baby proportions: a proportionally LARGE head, round chubby cheeks, short chubby arms and legs, a soft little rounded torso, smooth baby skin, no waist definition and absolutely no adult or teenage musculature. A tiny child-sized jersey.',
+  },
+  nino: {
+    kind: 'child', label: 'Niño (4-9)', en: 'young child, about 4 to 9 years old',
+    body: 'Render a CHILD body: a small, slim child frame with childlike proportions, slim short limbs, a head slightly large for the body, a smooth child face, and no adult musculature or adult body shape. A kid-sized jersey.',
+  },
+  adolescente: {
+    kind: 'teen', label: 'Adolescente (10-17)', en: 'teenager, about 10 to 17 years old',
+    body: 'Youthful adolescent build, slimmer and less developed than a grown adult.',
+  },
+  adulto: {
+    kind: 'adult', label: 'Adulto (18+)', en: 'adult', body: '',
+  },
+};
+
+// Negativos para forzar que niños/bebés NO salgan envejecidos.
+const AGE_NEG_CHILD = [
+  'adult', 'adult body', 'adult face', 'grown-up', 'grown man', 'grown woman',
+  'teenager', 'older child', 'aged up', 'old face', 'wrinkles', 'mature features',
+  'muscular', 'broad shoulders', 'facial hair', 'makeup',
+];
+
 /**
  * @param {string} genero  - "Hombre" | "Mujer"
  * @param {number} altura  - cm
  * @param {number} peso    - kg
+ * @param {string} [edad]  - "bebe" | "nino" | "adolescente" | "adulto"
  * @returns {{ bodyDescription, negativeAddons, label, imc }}
  */
-function determinarComplexion(genero, altura, peso) {
+function determinarComplexion(genero, altura, peso, edad) {
   const imc   = calcularIMC(altura, peso);
   const frame = frameEstatura(genero, altura);
   const tiers = genero === 'Mujer' ? TIERS_MUJER : TIERS_HOMBRE;
   const sexo  = genero === 'Mujer' ? 'Female' : 'Male';
+  const age   = AGE_INFO[edad] || AGE_INFO.adulto;
 
   const tier = tiers.find(t => imc < t.max) || tiers[tiers.length - 1];
 
+  // ── Niños / bebés: el cuerpo lo decide la EDAD, se ignora el IMC adulto ──
+  if (age.kind === 'child') {
+    const bodyDescription =
+      `${sexo} ${age.en}. ${age.body} ` +
+      `Keep natural CHILD proportions for this age — IGNORE any adult build, adult muscularity, ` +
+      `broad adult shoulders or BMI-based adult complexion. Do NOT age the person up or make them ` +
+      `look like an older child, a teenager or an adult.`;
+    return {
+      bodyDescription,
+      negativeAddons: AGE_NEG_CHILD,
+      label: age.label,
+      imc: Number(imc.toFixed(1)),
+    };
+  }
+
+  // ── Adolescente: cuerpo juvenil, conserva matiz de IMC pero más delgado ──
+  if (age.kind === 'teen') {
+    const shoulders = sexo === 'Female'
+      ? 'Narrow, feminine teenage shoulders and a slim youthful frame (NOT broad or boxy).'
+      : 'Slimmer teenage male frame, not yet fully adult-broad.';
+    const bodyDescription =
+      `${sexo} ${age.en}, ${altura}cm, ${peso}kg. ${age.body} ${tier.desc} ${shoulders} ` +
+      `Natural head-to-body proportion. Youthful — slimmer and less developed than a grown adult; ` +
+      `do NOT age up to a full adult physique.`;
+    return {
+      bodyDescription,
+      negativeAddons: [...tier.neg, 'adult body', 'grown man', 'grown woman', 'aged up', 'middle-aged'],
+      label: age.label,
+      imc: Number(imc.toFixed(1)),
+    };
+  }
+
+  // ── Adulto (comportamiento por IMC de siempre) ──
   const shoulders = sexo === 'Female'
     ? 'Narrow, feminine shoulders and a slimmer frame with a natural waist (NOT broad or boxy).'
     : 'Broader male shoulders and frame.';
@@ -265,10 +334,10 @@ function determinarComplexion(genero, altura, peso) {
  * @param {number} params.peso     kg
  * @returns {{ positivePrompt: string, negativePrompt: string, metadata: object }}
  */
-function construirPromptFinal({ genero, altura, peso, provider }) {
-  const { bodyDescription, negativeAddons, label, imc } = determinarComplexion(genero, altura, peso);
+function construirPromptFinal({ genero, altura, peso, edad, provider }) {
+  const { bodyDescription, negativeAddons, label, imc } = determinarComplexion(genero, altura, peso, edad);
 
-  const seccionBody = `BODY: ${bodyDescription}`;
+  const seccionBody = `AGE & BODY: ${bodyDescription}`;
   // Gemini usa un prompt limpio (se apoya en las 3 imágenes); OpenAI usa el
   // detallado (edita solo la selfie, sin imágenes de camiseta/balón).
   const base = (provider === 'gemini' || provider === 'hybrid') ? GEMINI_PROMPT_BASE
@@ -284,6 +353,7 @@ function construirPromptFinal({ genero, altura, peso, provider }) {
       genero,
       altura,
       peso,
+      edad: edad || 'adulto',
       imc,
       complexion: label,
     },
@@ -294,8 +364,8 @@ function construirPromptFinal({ genero, altura, peso, provider }) {
  * Devuelve el label de complexión para mostrar en frontend.
  * (llamada rápida sin construir el prompt completo)
  */
-function getComplexionLabel(genero, altura, peso) {
-  return determinarComplexion(genero, altura, peso).label;
+function getComplexionLabel(genero, altura, peso, edad) {
+  return determinarComplexion(genero, altura, peso, edad).label;
 }
 
 module.exports = { construirPromptFinal, getComplexionLabel };

@@ -24,6 +24,7 @@ const state = {
   selfieBase64:  null,   // base64 redimensionado (sin prefijo data:)
   selfieMime:    'image/jpeg',
   genero:        'Hombre',
+  edad:          'adulto',
   altura:        170,
   peso:          70,
   resultImageUrl: null,
@@ -65,8 +66,8 @@ function initParticles() {
   resize();
   window.addEventListener('resize', resize, { passive: true });
 
-  const GOLD  = 'rgba(27,109,245,';
-  const GREEN = 'rgba(34,211,255,';
+  const GOLD  = 'rgba(20,111,214,';
+  const GREEN = 'rgba(90,162,242,';
 
   const particles = Array.from({ length: 55 }, () => ({
     x:     Math.random() * canvas.width,
@@ -270,9 +271,50 @@ function hideUploadError() {
    ═══════════════════════════════════════════════ */
 function selectGender(genero, btn) {
   state.genero = genero;
-  document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#gender-toggle .gender-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   updateComplexion();
+}
+
+/* ═══════════════════════════════════════════════
+   EDAD — ajusta rangos de estatura/peso por grupo
+   ═══════════════════════════════════════════════ */
+// Rangos sensatos por edad (cm / kg). Adulto = igual que antes.
+const AGE_RANGES = {
+  bebe:        { altura: { min: 45,  max: 120, val: 85  }, peso: { min: 3,  max: 25,  val: 12 } },
+  nino:        { altura: { min: 95,  max: 155, val: 125 }, peso: { min: 13, max: 55,  val: 26 } },
+  adolescente: { altura: { min: 135, max: 195, val: 165 }, peso: { min: 30, max: 110, val: 55 } },
+  adulto:      { altura: { min: 140, max: 220, val: 170 }, peso: { min: 40, max: 180, val: 70 } },
+};
+
+function selectAge(edad, btn) {
+  state.edad = edad;
+  document.querySelectorAll('#age-toggle .gender-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  // Reconfigura los sliders al rango propio de la edad.
+  const r = AGE_RANGES[edad] || AGE_RANGES.adulto;
+  applyRange('slider-altura', r.altura);
+  applyRange('slider-peso',   r.peso);
+  syncSlider('slider-altura', 'val-altura', 'cm');
+  syncSlider('slider-peso',   'val-peso',   'kg');
+  updateComplexion();
+}
+
+/** Aplica min/max/valor a un slider y sus etiquetas de extremos. */
+function applyRange(sliderId, range) {
+  const slider = document.getElementById(sliderId);
+  if (!slider) return;
+  slider.min   = range.min;
+  slider.max   = range.max;
+  slider.value = range.val;
+  const ends = slider.closest('.field-block')?.querySelector('.slider-ends');
+  if (ends) {
+    const unit = sliderId === 'slider-altura' ? 'cm' : 'kg';
+    const spans = ends.querySelectorAll('span');
+    if (spans[0]) spans[0].textContent = `${range.min} ${unit}`;
+    if (spans[1]) spans[1].textContent = `${range.max} ${unit}`;
+  }
 }
 
 /* ═══════════════════════════════════════════════
@@ -346,12 +388,28 @@ const TIERS_CHIP = {
   ],
 };
 
+// Etiqueta de edad para el chip (cuando no es adulto).
+const AGE_CHIP = {
+  bebe:        '👶 Bebé · cuerpo de bebé',
+  nino:        '🧒 Niño · cuerpo de niño',
+  adolescente: '🧑 Adolescente',
+};
+
 function updateComplexion() {
   const m   = state.altura / 100;
   const imc = state.peso / (m * m);
   const tiers = TIERS_CHIP[state.genero] || TIERS_CHIP.Hombre;
   const tier  = tiers.find(t => imc < t.max) || tiers[tiers.length - 1];
-  const label = `${tier.txt} · IMC ${imc.toFixed(1)}`;
+
+  // En bebé/niño el IMC adulto no aplica: mostramos la edad.
+  let label;
+  if (state.edad === 'bebe' || state.edad === 'nino') {
+    label = AGE_CHIP[state.edad];
+  } else if (state.edad === 'adolescente') {
+    label = `${AGE_CHIP.adolescente} · ${tier.txt}`;
+  } else {
+    label = `${tier.txt} · IMC ${imc.toFixed(1)}`;
+  }
 
   const chip = document.getElementById('complexion-chip');
   const txt  = document.getElementById('complexion-txt');
@@ -388,6 +446,7 @@ async function generateImage() {
       selfie:     state.selfieBase64,
       selfieMime: state.selfieMime,
       genero:     state.genero,
+      edad:       state.edad,
       altura:     state.altura,
       peso:       state.peso,
     };

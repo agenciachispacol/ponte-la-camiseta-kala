@@ -35,6 +35,7 @@ app.post('/api/generate', async (req, res) => {
       genero:       req.body.genero,
       altura:       req.body.altura,
       peso:         req.body.peso,
+      edad:         req.body.edad,
       selfieBase64: req.body.selfie,
       selfieMime:   req.body.selfieMime,
       mode:         req.body.mode,

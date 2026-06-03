@@ -22,6 +22,7 @@ module.exports = async (req, res) => {
       genero:       body.genero,
       altura:       body.altura,
       peso:         body.peso,
+      edad:         body.edad,
       selfieBase64: body.selfie,
       selfieMime:   body.selfieMime,
       mode:         body.mode,

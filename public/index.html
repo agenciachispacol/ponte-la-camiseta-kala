@@ -19,7 +19,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=20260603-2" />
+  <link rel="stylesheet" href="style.css?v=20260603-3" />
 </head>
 <body>
 
@@ -232,6 +232,17 @@
 
         <div class="form-fields">
 
+          <!-- Edad -->
+          <div class="field-block">
+            <label class="field-label">Edad</label>
+            <div class="age-toggle" id="age-toggle">
+              <button class="gender-btn" id="abtn-bebe" onclick="selectAge('bebe', this)" type="button">👶 Bebé</button>
+              <button class="gender-btn" id="abtn-nino" onclick="selectAge('nino', this)" type="button">🧒 Niño</button>
+              <button class="gender-btn" id="abtn-adolescente" onclick="selectAge('adolescente', this)" type="button">🧑 Adolescente</button>
+              <button class="gender-btn active" id="abtn-adulto" onclick="selectAge('adulto', this)" type="button">🧔 Adulto</button>
+            </div>
+          </div>
+
           <!-- Género -->
           <div class="field-block">
             <label class="field-label">Género</label>
@@ -416,10 +427,10 @@
     </div>
   </div>
 
-  <script src="app.js?v=20260603-2"></script>
+  <script src="app.js?v=20260603-3"></script>
 
   <!-- Guía animada del recuadro de subida (Lottie, autohospedada) -->
-  <script src="assets/lottie/lottie.min.js?v=20260603-2" defer></script>
+  <script src="assets/lottie/lottie.min.js?v=20260603-3" defer></script>
   <script>
     window.addEventListener('load', function () {
       var box = document.getElementById('selfie-lottie');
@@ -430,7 +441,7 @@
         renderer: 'svg',
         loop: true,
         autoplay: !reduce,
-        path: 'assets/lottie/selfie-frente.json?v=20260603-2'
+        path: 'assets/lottie/selfie-frente.json?v=20260603-3'
       });
       anim.addEventListener('DOMLoaded', function () {
         // Oculta el fallback estático (brackets CSS) cuando la animación carga

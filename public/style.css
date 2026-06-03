@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════════════════
    KALA CAMPAIGN — style.css
    Tipografía: Raleway (Google Fonts)
-   Paleta: Azul profundo + Azul KALA (#1B6DF5) + Cyan estadio
+   Paleta KALA: Azul oscuro #062951 + Azul claro #146FD6
    NOTA: los tokens --gold* conservan su nombre pero ahora
          contienen el AZUL de marca KALA.
    ═══════════════════════════════════════════════════════════ */
@@ -14,13 +14,13 @@
   --bg-1:          #070D1C;
   --bg-2:          #0B1530;
 
-  --gold:          #1B6DF5;
-  --gold-light:    #5B9BFF;
-  --gold-dark:     #0A47C2;
-  --gold-glow:     rgba(27, 109, 245, 0.35);
+  --gold:          #146FD6;
+  --gold-light:    #5AA2F2;
+  --gold-dark:     #062951;
+  --gold-glow:     rgba(20, 111, 214, 0.35);
 
-  --green:         #22D3FF;
-  --green-dim:     rgba(34, 211, 255, 0.15);
+  --green:         #5AA2F2;
+  --green-dim:     rgba(20, 111, 214, 0.15);
 
   --white:         #FFFFFF;
   --white-70:      rgba(255,255,255,0.70);
@@ -28,14 +28,14 @@
   --white-15:      rgba(255,255,255,0.08);
 
   --glass:         rgba(7,13,28,0.80);
-  --glass-border:  rgba(27,109,245,0.22);
-  --glass-border-h:rgba(27,109,245,0.55);
+  --glass-border:  rgba(20,111,214,0.22);
+  --glass-border-h:rgba(20,111,214,0.55);
 
   --radius-sm:     10px;
   --radius-md:     18px;
   --radius-lg:     28px;
 
-  --shadow-gold:   0 0 40px rgba(27,109,245,0.18), 0 8px 32px rgba(0,0,0,0.5);
+  --shadow-gold:   0 0 40px rgba(20,111,214,0.18), 0 8px 32px rgba(0,0,0,0.5);
   --shadow-card:   0 4px 40px rgba(0,0,0,0.6), 0 0 1px rgba(255,255,255,0.06);
 }
 
@@ -71,13 +71,13 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   background:      linear-gradient(to bottom, rgba(2,4,9,0.95), transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-bottom:   1px solid rgba(27,109,245,0.08);
+  border-bottom:   1px solid rgba(20,111,214,0.08);
   transition:      background 0.3s;
 }
 
 .navbar.scrolled {
   background: rgba(7,12,24,0.97);
-  border-bottom-color: rgba(27,109,245,0.15);
+  border-bottom-color: rgba(20,111,214,0.15);
 }
 
 .navbar-brand { display: flex; align-items: center; text-decoration: none; }
@@ -104,8 +104,8 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   font-weight:    600;
   letter-spacing: 0.5px;
   color:          var(--white-70);
-  background:     rgba(27,109,245,0.1);
-  border:         1px solid rgba(27,109,245,0.2);
+  background:     rgba(20,111,214,0.1);
+  border:         1px solid rgba(20,111,214,0.2);
   padding:        6px 14px;
   border-radius:  999px;
   text-transform: uppercase;
@@ -155,7 +155,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   position: absolute;
   inset:    0;
   background:
-    radial-gradient(ellipse at 50% 30%, rgba(27,109,245,0.22) 0%, transparent 60%),
+    radial-gradient(ellipse at 50% 30%, rgba(20,111,214,0.22) 0%, transparent 60%),
     linear-gradient(
       180deg,
       rgba(4,7,15,0.35) 0%,
@@ -184,8 +184,8 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   align-items: center;
   gap:         12px;
   margin-bottom: 28px;
-  background:  rgba(27,109,245,0.08);
-  border:      1px solid rgba(27,109,245,0.25);
+  background:  rgba(20,111,214,0.08);
+  border:      1px solid rgba(20,111,214,0.25);
   border-radius: 999px;
   padding:     8px 20px;
 }
@@ -229,7 +229,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   font-style: normal;
   -webkit-text-stroke: 1px var(--gold-dark);
   text-shadow:
-    0 0 60px rgba(27,109,245,0.5),
+    0 0 60px rgba(20,111,214,0.5),
     0 2px 40px rgba(0,0,0,0.8);
 }
 
@@ -240,7 +240,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   max-width: 92%;
   width:     auto;
   object-fit: contain;
-  filter:    drop-shadow(0 0 28px rgba(27,109,245,0.65))
+  filter:    drop-shadow(0 0 28px rgba(20,111,214,0.65))
              drop-shadow(0 2px 20px rgba(0,0,0,0.7));
 }
 
@@ -278,7 +278,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   border:         none;
   cursor:         pointer;
   transition:     transform 0.2s, box-shadow 0.2s;
-  box-shadow:     0 4px 24px rgba(27,109,245,0.4), 0 0 0 0 rgba(27,109,245,0.4);
+  box-shadow:     0 4px 24px rgba(20,111,214,0.4), 0 0 0 0 rgba(20,111,214,0.4);
   animation:      hero-btn-glow 3s infinite;
 }
 
@@ -286,12 +286,12 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
 
 .btn-hero:hover {
   transform:  translateY(-2px);
-  box-shadow: 0 8px 40px rgba(27,109,245,0.55);
+  box-shadow: 0 8px 40px rgba(20,111,214,0.55);
 }
 
 @keyframes hero-btn-glow {
-  0%,100% { box-shadow: 0 4px 24px rgba(27,109,245,0.4); }
-  50%     { box-shadow: 0 4px 40px rgba(27,109,245,0.65); }
+  0%,100% { box-shadow: 0 4px 24px rgba(20,111,214,0.4); }
+  50%     { box-shadow: 0 4px 40px rgba(20,111,214,0.65); }
 }
 
 .hero-cta-hint {
@@ -446,8 +446,8 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
 /* Active */
 .step-dot.active .sdot-circle {
   border-color: var(--gold);
-  background:   rgba(27,109,245,0.12);
-  box-shadow:   0 0 20px rgba(27,109,245,0.25);
+  background:   rgba(20,111,214,0.12);
+  box-shadow:   0 0 20px rgba(20,111,214,0.25);
 }
 .step-dot.active .sdot-num { color: var(--gold); }
 .step-dot.active .sdot-label { color: var(--gold); }
@@ -455,7 +455,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
 /* Done */
 .step-dot.done .sdot-circle {
   border-color: var(--green);
-  background:   rgba(34,211,255,0.12);
+  background:   rgba(20,111,214,0.12);
 }
 .step-dot.done .sdot-num { display: none; }
 .step-dot.done .sdot-check { opacity: 1; color: var(--green); }
@@ -513,8 +513,8 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   color:          var(--gold);
-  background:     rgba(27,109,245,0.1);
-  border:         1px solid rgba(27,109,245,0.2);
+  background:     rgba(20,111,214,0.1);
+  border:         1px solid rgba(20,111,214,0.2);
   padding:        4px 12px;
   border-radius:  999px;
   margin-bottom:  14px;
@@ -536,7 +536,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
 
 /* ── UPLOAD ZONE ─────────────────────────────────────────── */
 .upload-zone {
-  border:         2px dashed rgba(27,109,245,0.25);
+  border:         2px dashed rgba(20,111,214,0.25);
   border-radius:  var(--radius-md);
   padding:        40px 24px;
   text-align:     center;
@@ -552,8 +552,8 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
 
 .upload-zone:hover, .upload-zone.drag-over {
   border-color:   var(--gold);
-  background:     rgba(27,109,245,0.04);
-  box-shadow:     0 0 30px rgba(27,109,245,0.12);
+  background:     rgba(20,111,214,0.04);
+  box-shadow:     0 0 30px rgba(20,111,214,0.12);
 }
 
 .upload-empty { display: flex; flex-direction: column; align-items: center; gap: 10px; }
@@ -629,7 +629,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
 @keyframes tipGlow {
   0%, 22%, 100% { transform: translateY(0); box-shadow: none; filter: none; }
   8%            { transform: translateY(-3px);
-                  box-shadow: 0 4px 14px rgba(34,211,255,0.35);
+                  box-shadow: 0 4px 14px rgba(20,111,214,0.35);
                   filter: brightness(1.25); }
 }
 
@@ -647,7 +647,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   padding:       16px 18px;
   border:        1px solid var(--glass-border);
   border-radius: var(--radius-sm);
-  background:    rgba(27,109,245,0.05);
+  background:    rgba(20,111,214,0.05);
 }
 
 .photo-tips-title {
@@ -698,7 +698,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
 .upload-preview img {
   width:         100%;
   border-radius: var(--radius-md);
-  box-shadow:    0 0 40px rgba(27,109,245,0.2);
+  box-shadow:    0 0 40px rgba(20,111,214,0.2);
   aspect-ratio:  3/4;
   object-fit:    cover;
 }
@@ -708,7 +708,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   bottom:         12px;
   left:           50%;
   transform:      translateX(-50%);
-  background:     rgba(34,211,255,0.9);
+  background:     rgba(20,111,214,0.9);
   color:          var(--bg-0);
   font-size:      12px;
   font-weight:    700;
@@ -758,8 +758,8 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   font-size:      14px;
   font-weight:    700;
   color:          var(--white);
-  background:     rgba(27,109,245,0.12);
-  border:         1px solid rgba(27,109,245,0.35);
+  background:     rgba(20,111,214,0.12);
+  border:         1px solid rgba(20,111,214,0.35);
   padding:        11px 20px;
   border-radius:  999px;
   cursor:         pointer;
@@ -769,7 +769,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
 .upload-btn svg { width: 18px; height: 18px; stroke: var(--gold-light); }
 
 .upload-btn:hover {
-  background:     rgba(27,109,245,0.22);
+  background:     rgba(20,111,214,0.22);
   border-color:   var(--gold);
   transform:      translateY(-1px);
 }
@@ -780,7 +780,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   color:        #fff;
 }
 .upload-btn.cam svg { stroke: #fff; }
-.upload-btn.cam:hover { box-shadow: 0 6px 20px rgba(27,109,245,0.45); }
+.upload-btn.cam:hover { box-shadow: 0 6px 20px rgba(20,111,214,0.45); }
 
 /* Error */
 .upload-error {
@@ -833,6 +833,14 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   gap:     8px;
 }
 
+/* Selector de edad (4 opciones, rejilla 2×2) */
+.age-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap:     8px;
+}
+.age-toggle .gender-btn { font-size: 14px; padding: 12px 8px; }
+
 .gender-btn {
   display:        flex;
   align-items:    center;
@@ -853,15 +861,15 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
 .gender-btn svg { width: 20px; height: 20px; }
 
 .gender-btn:hover {
-  border-color:  rgba(27,109,245,0.3);
+  border-color:  rgba(20,111,214,0.3);
   color:         var(--white);
 }
 
 .gender-btn.active {
   border-color:  var(--gold);
-  background:    rgba(27,109,245,0.1);
+  background:    rgba(20,111,214,0.1);
   color:         var(--gold);
-  box-shadow:    0 0 16px rgba(27,109,245,0.15);
+  box-shadow:    0 0 16px rgba(20,111,214,0.15);
 }
 
 /* Sliders */
@@ -903,7 +911,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   border-radius: 50%;
   background:    var(--gold);
   border:        3px solid var(--bg-0);
-  box-shadow:    0 0 12px rgba(27,109,245,0.5);
+  box-shadow:    0 0 12px rgba(20,111,214,0.5);
   cursor:        pointer;
   transition:    transform 0.15s;
   margin-top:    -8px;
@@ -917,7 +925,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   border-radius: 50%;
   background:    var(--gold);
   border:        3px solid var(--bg-0);
-  box-shadow:    0 0 12px rgba(27,109,245,0.5);
+  box-shadow:    0 0 12px rgba(20,111,214,0.5);
   cursor:        pointer;
 }
 
@@ -935,8 +943,8 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   display:       flex;
   align-items:   center;
   gap:           10px;
-  background:    rgba(27,109,245,0.08);
-  border:        1px solid rgba(27,109,245,0.2);
+  background:    rgba(20,111,214,0.08);
+  border:        1px solid rgba(20,111,214,0.2);
   border-radius: var(--radius-sm);
   padding:       12px 16px;
   font-size:     14px;
@@ -968,14 +976,14 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   border:         none;
   cursor:         pointer;
   transition:     transform 0.2s, box-shadow 0.2s, opacity 0.2s;
-  box-shadow:     0 4px 20px rgba(27,109,245,0.3);
+  box-shadow:     0 4px 20px rgba(20,111,214,0.3);
 }
 
 .btn-primary svg { width: 18px; height: 18px; }
 
 .btn-primary:hover {
   transform:  translateY(-1px);
-  box-shadow: 0 6px 30px rgba(27,109,245,0.45);
+  box-shadow: 0 6px 30px rgba(20,111,214,0.45);
 }
 
 .btn-primary:disabled {
@@ -1035,7 +1043,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
 .r1 {
   inset:           0;
   border-top-color: var(--gold);
-  border-right-color: rgba(27,109,245,0.3);
+  border-right-color: rgba(20,111,214,0.3);
   animation-duration: 1.5s;
 }
 
@@ -1050,7 +1058,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
 .r3 {
   inset:            24px;
   border-bottom-color: var(--green);
-  border-right-color: rgba(34,211,255,0.2);
+  border-right-color: rgba(20,111,214,0.2);
   animation-duration: 3s;
 }
 
@@ -1060,11 +1068,11 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   position:       absolute;
   inset:          36px;
   border-radius:  50%;
-  background:     radial-gradient(circle at 40% 40%, rgba(27,109,245,0.2), rgba(7,12,24,0.9));
+  background:     radial-gradient(circle at 40% 40%, rgba(20,111,214,0.2), rgba(7,12,24,0.9));
   display:        flex;
   align-items:    center;
   justify-content: center;
-  border:         1px solid rgba(27,109,245,0.2);
+  border:         1px solid rgba(20,111,214,0.2);
 }
 
 .orb-logo { width: 44px; height: auto; filter: brightness(1.1); }
@@ -1133,7 +1141,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
 
 .lc-item.active {
   color:       var(--gold-light);
-  background:  rgba(27,109,245,0.08);
+  background:  rgba(20,111,214,0.08);
   border-left: 3px solid var(--gold);
 }
 
@@ -1179,7 +1187,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   padding:        16px;
   border:         1px solid var(--glass-border);
   border-radius:  var(--radius-md);
-  background:     rgba(27,109,245,0.04);
+  background:     rgba(20,111,214,0.04);
 }
 
 .version-label {
@@ -1196,7 +1204,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   font-weight: 700;
   color:       var(--gold-light);
   text-align:  center;
-  background:  rgba(27,109,245,0.10);
+  background:  rgba(20,111,214,0.10);
   border-radius: 6px;
   padding:     3px 8px;
 }
@@ -1228,7 +1236,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   border-radius: var(--radius-md);
   overflow:      hidden;
   margin-bottom: 0;
-  box-shadow:    0 0 60px rgba(27,109,245,0.2), var(--shadow-card);
+  box-shadow:    0 0 60px rgba(20,111,214,0.2), var(--shadow-card);
   animation:     result-reveal 0.6s ease;
 }
 
@@ -1247,7 +1255,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
 .result-glow {
   position:   absolute;
   inset:      0;
-  background: linear-gradient(to top, rgba(27,109,245,0.15) 0%, transparent 50%);
+  background: linear-gradient(to top, rgba(20,111,214,0.15) 0%, transparent 50%);
   pointer-events: none;
 }
 
@@ -1258,7 +1266,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   background:    rgba(7,12,24,0.85);
   padding:       8px 12px;
   border-radius: var(--radius-sm);
-  border:        1px solid rgba(27,109,245,0.3);
+  border:        1px solid rgba(20,111,214,0.3);
   backdrop-filter: blur(8px);
 }
 
@@ -1288,11 +1296,11 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   font-weight:    800;
   cursor:         pointer;
   transition:     all 0.2s;
-  box-shadow:     0 4px 24px rgba(27,109,245,0.35);
+  box-shadow:     0 4px 24px rgba(20,111,214,0.35);
 }
 
 .btn-download svg { width: 20px; height: 20px; }
-.btn-download:hover { transform: translateY(-1px); box-shadow: 0 6px 36px rgba(27,109,245,0.5); }
+.btn-download:hover { transform: translateY(-1px); box-shadow: 0 6px 36px rgba(20,111,214,0.5); }
 
 .download-hint {
   margin-top: -6px;
@@ -1356,7 +1364,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
 }
 
 .btn-retry svg { width: 16px; height: 16px; }
-.btn-retry:hover { border-color: rgba(27,109,245,0.3); color: var(--gold); }
+.btn-retry:hover { border-color: rgba(20,111,214,0.3); color: var(--gold); }
 
 /* ── FOOTER ──────────────────────────────────────────────── */
 .site-footer {
@@ -1398,8 +1406,8 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
   height:         22px;
   margin-top:     1px;
   border-radius:  6px;
-  border:         2px solid rgba(27,109,245,0.5);
-  background:     rgba(27,109,245,0.06);
+  border:         2px solid rgba(20,111,214,0.5);
+  background:     rgba(20,111,214,0.06);
   position:       relative;
   transition:     background 0.2s, border-color 0.2s;
 }
@@ -1420,7 +1428,7 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
 }
 
 .consent-row input:focus-visible + .consent-box {
-  box-shadow: 0 0 0 3px rgba(27,109,245,0.35);
+  box-shadow: 0 0 0 3px rgba(20,111,214,0.35);
 }
 
 .consent-text {

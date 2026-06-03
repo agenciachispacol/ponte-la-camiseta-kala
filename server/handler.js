@@ -47,6 +47,9 @@ async function handleGenerate(input) {
   const genero = input.genero;
   const altura = parseFloat(input.altura);
   const peso   = parseFloat(input.peso);
+  // Grupo de edad (bebé/niño/adolescente/adulto). Default 'adulto' por compatibilidad.
+  const EDADES = ['bebe', 'nino', 'adolescente', 'adulto'];
+  const edad   = EDADES.includes(input.edad) ? input.edad : 'adulto';
 
   // ── Validación ──────────────────────────────
   if (!input.selfieBase64) {
@@ -55,11 +58,12 @@ async function handleGenerate(input) {
   if (!genero || !['Hombre', 'Mujer'].includes(genero)) {
     const e = new Error('Género inválido. Usa "Hombre" o "Mujer".'); e.status = 400; throw e;
   }
-  if (isNaN(altura) || altura < 100 || altura > 250) {
-    const e = new Error('Altura inválida (100-250 cm).'); e.status = 400; throw e;
+  // Mínimos bajos para admitir bebés/niños (un bebé ~45-110cm, ~3-25kg).
+  if (isNaN(altura) || altura < 40 || altura > 250) {
+    const e = new Error('Altura inválida (40-250 cm).'); e.status = 400; throw e;
   }
-  if (isNaN(peso) || peso < 30 || peso > 300) {
-    const e = new Error('Peso inválido (30-300 kg).'); e.status = 400; throw e;
+  if (isNaN(peso) || peso < 2 || peso > 300) {
+    const e = new Error('Peso inválido (2-300 kg).'); e.status = 400; throw e;
   }
 
   const both      = input.mode === 'both';
@@ -76,12 +80,12 @@ async function handleGenerate(input) {
           { label: 'Gemini', provider: 'gemini', imageUrl: demoUrl },
           { label: 'OpenAI', provider: 'openai', imageUrl: demoUrl },
         ],
-        metadata: { genero, altura, peso },
+        metadata: { genero, altura, peso, edad },
       };
     }
     return {
       demo: true, imageUrl: demoUrl,
-      metadata: { genero, altura, peso },
+      metadata: { genero, altura, peso, edad },
       message: 'Demo mode. Configura GEMINI_API_KEY y DEMO_MODE=false para generación real.',
     };
   }
@@ -92,14 +96,14 @@ async function handleGenerate(input) {
     if (!input.baseImage) { const e = new Error('Falta la imagen base.'); e.status = 400; throw e; }
     const baseImage = { base64: input.baseImage, mimeType: input.baseMime || 'image/jpeg' };
     const result = await withTimeout(faceEditOnBase(baseImage, faceImage), PROVIDER_TIMEOUT_MS, 'hybrid-edit');
-    const meta = { genero, altura, peso };
+    const meta = { genero, altura, peso, edad };
     if (result.type === 'url')    return { imageUrl: result.url, provider: 'hybrid-edit', model: result.model, metadata: meta };
     if (result.type === 'base64') return { imageDataUrl: `data:${result.mimeType};base64,${result.data}`, provider: 'hybrid-edit', model: result.model, metadata: meta };
     throw new Error('Resultado de IA desconocido.');
   }
 
   // ── Construir prompt ────────────────────────
-  const { positivePrompt, negativePrompt, metadata } = construirPromptFinal({ genero, altura, peso });
+  const { positivePrompt, negativePrompt, metadata } = construirPromptFinal({ genero, altura, peso, edad });
 
   // ── Modo "2 versiones" (Gemini + OpenAI en paralelo) ──
   if (both) {
@@ -126,7 +130,7 @@ async function handleGenerate(input) {
   // ── Un solo proveedor específico (cada pedido = su propia función) ──
   if (['gemini', 'openai', 'flux', 'hybrid'].includes(input.provider)) {
     // Prompt específico por motor (Gemini limpio / OpenAI detallado).
-    const built = construirPromptFinal({ genero, altura, peso, provider: input.provider });
+    const built = construirPromptFinal({ genero, altura, peso, edad, provider: input.provider });
     let prompt = built.positivePrompt;
     if (built.negativePrompt) prompt += `\n\nAVOID: ${built.negativePrompt}.`;
     // Variación de pose/ángulo para que las 2 opciones se vean distintas.
