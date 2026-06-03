@@ -354,12 +354,11 @@ async function generateHybrid(prompt, faceImage) {
 
   try {
     const res = await oai.images.edit({
-      model:          process.env.OPENAI_IMAGE_MODEL || 'gpt-image-2',
-      image:          [baseFile, selfieFile],
-      prompt:         editPrompt,
-      size:           '1024x1536',
-      quality:        process.env.OPENAI_IMAGE_QUALITY || 'medium',
-      input_fidelity: 'high',
+      model:   process.env.OPENAI_IMAGE_MODEL || 'gpt-image-2',
+      image:   [baseFile, selfieFile],
+      prompt:  editPrompt,
+      size:    '1024x1536',
+      quality: process.env.OPENAI_IMAGE_QUALITY || 'medium',
     });
     const img = res?.data?.[0];
     if (img?.b64_json) return { type: 'base64', data: img.b64_json, mimeType: 'image/png', model: 'hybrid(gemini+gpt-image-2)' };
