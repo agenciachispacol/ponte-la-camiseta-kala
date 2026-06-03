@@ -82,32 +82,21 @@ jersey, ball, background). A perfect stadium photo with the wrong face is a FAIL
 // el texto se apoya en ellas en vez de sobre-describir todo.
 // ─────────────────────────────────────────────
 const GEMINI_PROMPT_BASE = `
-Ultra-realistic photo of the SAME person from the FIRST reference image (their face), standing
-in a packed nighttime football stadium with floodlights and a green pitch.
-
-COPY THE FACE — DO NOT RE-IMAGINE IT: Reproduce the face from the first reference image as
-faithfully as if it were a real photograph of that exact same person. Do NOT redraw, restyle,
-average, "improve" or re-imagine the features. Keep the EXACT same face shape and width, the
-same amount of facial fat (do NOT slim a full or round face), the same eyes and eye color, the
-same nose, mouth, lips, jawline, chin, eyebrows, skin tone and skin marks, the same
-beard/stubble, and the same hairstyle and hair length. Keep their real age and weight. The
-result must be unmistakably the SAME person — a friend should recognize them instantly. Never
-beautify, slim, age or turn them into a model/athlete.
-
-Dress them in the WHITE KALA jersey from the SECOND reference image (navy "kala" wordmark across
-the chest, small navy "k" on the upper-right) and have them hold the colorful ball from the
-THIRD reference image. Copy the jersey and ball designs exactly from those images.
-
-{SECCION_BODY}
-
-Natural, anatomically-correct body: realistic shoulders, neck and torso that connect smoothly
-to the head and match the person's real build — NO distorted, shrunken, oversized, twisted or
-pasted-looking body, no weird neck or floating head. The head sits naturally on the shoulders.
-
-UPPER-BODY / CHEST-UP shot: the face is LARGE, sharp and clearly recognizable (this is the most
-important part), and the KALA logo on the chest plus the ball are still visible. Cinematic
-stadium lighting matched across face, body and background — one single cohesive real photo,
-no pasted/cut-out look. Photoreal skin with natural texture. Confident, proud, natural stance.
+Follow this structured brief and output ONE photorealistic photograph:
+{
+  "task": "Create a single realistic photo by compositing the 3 reference images.",
+  "subject": "the exact real person shown in image 1",
+  "identity_lock": "TOP PRIORITY. Copy the face from image 1 EXACTLY, as if reusing that same photo. Do NOT redraw, restyle, beautify, slim, age, symmetrize or average the features. Keep the same face shape and width, the same facial fullness/fat (never slim a round or full face), the same eyes and exact eye color, the same nose, mouth, lips, jawline, chin, eyebrows, skin tone and marks, the same beard/stubble, and the same hairstyle and hair length. It must be unmistakably the SAME person, recognizable at a glance, at their real age and weight.",
+  "outfit": "Dress the person in the white KALA soccer jersey from image 2. Copy its design and logo EXACTLY: clean white jersey, navy-blue 'kala' wordmark across the chest, small navy 'k' on the upper-right chest, V-neck with thin navy trim.",
+  "prop": "The person holds the colorful soccer ball from image 3 (white with red, blue and green panels).",
+  "body": "{SECCION_BODY}",
+  "anatomy": "Natural, correct body: realistic shoulders, neck and torso that connect smoothly to the head; no distorted, shrunken, oversized or floating-head look.",
+  "framing": "Chest-up shot. The face is LARGE, sharp and clearly recognizable (most important); the KALA chest logo and the ball stay visible.",
+  "setting": "packed nighttime football stadium, bright floodlights, green pitch, deep blue-black sky",
+  "lighting": "Cinematic stadium light matched across face, body and background. ONE single cohesive real photograph, no pasted or cut-out look, no halo around the head.",
+  "style": "ultra-realistic photograph, natural skin texture with visible pores, no plastic/over-smoothed skin",
+  "avoid": "a different person, a slimmed/chiseled/beautified/younger/model-like face, changed eye color, distorted body, pasted or cut-out look"
+}
 `.trim();
 
 // ─────────────────────────────────────────────
@@ -115,23 +104,26 @@ no pasted/cut-out look. Photoreal skin with natural texture. Confident, proud, n
 // image 1 = persona (selfie), image 2 = camiseta KALA.
 // ─────────────────────────────────────────────
 const FLUX_PROMPT_BASE = `
-Photorealistic photograph. Take the person from image 1 and keep their face EXACTLY — same face
-shape and width, same facial fat (do not slim a full/round face), same eyes and eye color, same
-nose, mouth, jawline, eyebrows, skin tone, beard/stubble, and the same hairstyle and hair
-length. It must clearly be the SAME real person, never beautified or turned into a model.
-
-Dress this person in the white soccer jersey shown in image 2 — copy that jersey and its logo
-EXACTLY (white jersey, navy-blue "kala" wordmark across the chest, small navy "k" on the
-upper-right, V-neck with navy trim). Place them in a packed nighttime football stadium with
-bright floodlights and a green pitch, holding a colorful soccer ball with red, blue and green
-panels.
-
-{SECCION_BODY}
-
-Waist-up shot at a natural distance: the face is clearly recognizable, the KALA logo and the
-ball are visible, the body looks natural and proportionate (correct shoulders, neck and torso,
-no distortion). Cinematic stadium lighting consistent across face, body and background — one
-single cohesive real photograph, not a collage.
+{
+  "task": "Photorealistic photo composite from the reference images.",
+  "face": {
+    "source": "image 1",
+    "instruction": "Keep this exact person's face. Same face shape and width, same facial fullness/fat (do NOT slim a full or round face), same eyes and exact eye color, same nose, mouth, lips, jawline, chin, eyebrows, skin tone and marks, same beard/stubble, same hairstyle and hair length. The SAME real person at their real age and weight — never beautified, slimmed or turned into a model."
+  },
+  "clothing": {
+    "source": "image 2",
+    "item": "clean white short-sleeve soccer jersey",
+    "logo": "navy-blue lowercase 'kala' wordmark large across the chest, plus a small navy 'k' on the upper-right chest, V-neck with thin navy trim",
+    "logo_color": "#1B2A4A",
+    "instruction": "copy the jersey design and the logo from image 2 exactly"
+  },
+  "prop": "the person holds a colorful soccer ball, white with red, blue and green geometric panels, at chest height or under the arm",
+  "scene": "packed nighttime football stadium with bright floodlights, a green pitch and a deep blue-black sky",
+  "body": "{SECCION_BODY}",
+  "framing": "chest-up portrait, natural body with correct shoulders/neck/torso, the face large and clearly recognizable, the KALA logo and the ball visible",
+  "lighting": "cinematic stadium floodlights consistent across face, body and background; one single cohesive real photograph, not a collage, no pasted/cut-out look",
+  "style": "photorealistic, natural skin texture with pores, sharp focus on the face"
+}
 `.trim();
 
 // ─────────────────────────────────────────────
