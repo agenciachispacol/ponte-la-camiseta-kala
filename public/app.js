@@ -392,36 +392,76 @@ async function generateImage() {
       peso:       state.peso,
     };
 
-    // 2 pedidos independientes con el mismo motor (Gemini) pero distinta
-    // variación de pose → 2 opciones distintas, rápidas y confiables en Vercel.
-    const reqOne = (provider, variant, label) =>
-      fetch(`${API_BASE}/api/generate`, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ ...base, provider, variant }),
-      })
-      .then(r => r.json())
-      .then(d => {
-        if (!d || !d.success) throw new Error(d && d.error ? d.error : 'fallo');
-        return { label, imageDataUrl: d.imageDataUrl, imageUrl: d.imageUrl, model: d.model, provider: d.provider || provider };
-      })
-      .catch(err => { console.warn(`[APP] ${label} falló:`, err.message); return { label, provider, error: true, detail: err.message }; });
+    // HÍBRIDO en 2 peticiones cortas (cada una <60s) → confiable en celular.
+    // Paso A: base con Gemini (camiseta/logo/cuerpo). ~20s.
+    const a = await postGenerate({ ...base, provider: 'gemini' });
+    const baseUrl = a.imageDataUrl || a.imageUrl;
+    if (!baseUrl) throw new Error('No se generó la base.');
 
-    // Solo el HÍBRIDO (Gemini logo/cuerpo exactos + OpenAI corrige la cara).
-    const settled = [ await reqOne('hybrid', undefined, 'Tu retrato') ];
-
-    if (!settled.some(v => v.imageDataUrl || v.imageUrl)) {
-      throw new Error('No se generó ninguna versión.');
+    // Paso B: OpenAI reemplaza solo la cara. La base se re-codifica a JPEG
+    // liviano para subirla rápido. Si B falla, se usa la base (logo/cuerpo OK).
+    let finalUrl = baseUrl;
+    let model    = 'base(gemini)';
+    try {
+      const baseJpeg = await dataUrlToJpeg(baseUrl, 1280, 0.9);
+      const b = await postGenerate({ ...base, provider: 'hybrid-edit', baseImage: baseJpeg.base64, baseMime: 'image/jpeg' });
+      finalUrl = b.imageDataUrl || b.imageUrl || baseUrl;
+      model    = b.model || 'hybrid';
+    } catch (e2) {
+      console.warn('[APP] face-edit (paso B) falló, uso la base de Gemini:', e2.message);
     }
 
-    finishLoadingAnimation(() => showResults(settled));
+    finishLoadingAnimation(() => showResults([
+      { label: 'Tu retrato', imageDataUrl: finalUrl, model, provider: 'hybrid' },
+    ]));
 
   } catch (err) {
     console.error('[APP] Error:', err); // detalle técnico solo en consola
     stopLoadingAnimation();
     goStep(2); // volver a datos
-    alert('😕 No pudimos crear tu retrato en este momento.\n\nIntenta de nuevo en unos segundos. Si vuelve a pasar, prueba con otra foto bien iluminada, de frente y sin gafas.');
+    const friendly = '😕 No pudimos crear tu retrato en este momento.\n\nIntenta de nuevo en unos segundos. Si vuelve a pasar, prueba con otra foto bien iluminada, de frente y sin gafas.';
+    alert(DEBUG ? friendly + '\n\n[debug] ' + (err && err.message ? err.message : err) : friendly);
   }
+}
+
+/** POST a /api/generate con 1 reintento ante fallo de red. Devuelve el JSON o lanza. */
+async function postGenerate(payload, retries = 1) {
+  try {
+    const r = await fetch(`${API_BASE}/api/generate`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
+    });
+    const d = await r.json().catch(() => null);
+    if (!d || !d.success) throw new Error(d && d.error ? d.error : `HTTP ${r.status}`);
+    return d;
+  } catch (err) {
+    if (retries > 0) {
+      await new Promise(res => setTimeout(res, 1500));
+      return postGenerate(payload, retries - 1);
+    }
+    throw err;
+  }
+}
+
+/** Re-codifica una data URL a JPEG (más liviana) para subirla rápido. */
+function dataUrlToJpeg(dataUrl, maxDim, quality) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        if (width >= height) { height = Math.round(height * maxDim / width); width = maxDim; }
+        else                 { width  = Math.round(width  * maxDim / height); height = maxDim; }
+      }
+      const c = document.createElement('canvas');
+      c.width = width; c.height = height;
+      c.getContext('2d').drawImage(img, 0, 0, width, height);
+      resolve({ base64: c.toDataURL('image/jpeg', quality).split(',')[1], mime: 'image/jpeg' });
+    };
+    img.onerror = reject;
+    img.src = dataUrl;
+  });
 }
 
 /* ═══════════════════════════════════════════════

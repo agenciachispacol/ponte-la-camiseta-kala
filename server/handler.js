@@ -6,8 +6,8 @@
 
 'use strict';
 
-const { construirPromptFinal }                            = require('./promptBuilder');
-const { generatePortrait, generateForProvider, withTimeout } = require('./aiClient');
+const { construirPromptFinal }                                          = require('./promptBuilder');
+const { generatePortrait, generateForProvider, faceEditOnBase, withTimeout } = require('./aiClient');
 
 // Tope por motor. En Vercel free conviene <60s; en Render (sin límite) se sube
 // con GEN_TIMEOUT_MS para permitir alta calidad.
@@ -84,6 +84,18 @@ async function handleGenerate(input) {
       metadata: { genero, altura, peso },
       message: 'Demo mode. Configura GEMINI_API_KEY y DEMO_MODE=false para generación real.',
     };
+  }
+
+  // ── Paso 2 del híbrido: face-edit sobre una base ya generada ──
+  // (No necesita prompt ni motor de texto; solo la base + la selfie.)
+  if (input.provider === 'hybrid-edit') {
+    if (!input.baseImage) { const e = new Error('Falta la imagen base.'); e.status = 400; throw e; }
+    const baseImage = { base64: input.baseImage, mimeType: input.baseMime || 'image/jpeg' };
+    const result = await withTimeout(faceEditOnBase(baseImage, faceImage), PROVIDER_TIMEOUT_MS, 'hybrid-edit');
+    const meta = { genero, altura, peso };
+    if (result.type === 'url')    return { imageUrl: result.url, provider: 'hybrid-edit', model: result.model, metadata: meta };
+    if (result.type === 'base64') return { imageDataUrl: `data:${result.mimeType};base64,${result.data}`, provider: 'hybrid-edit', model: result.model, metadata: meta };
+    throw new Error('Resultado de IA desconocido.');
   }
 
   // ── Construir prompt ────────────────────────

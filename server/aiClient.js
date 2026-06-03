@@ -332,42 +332,55 @@ async function generateWithFlux(prompt, faceImg, jerseyImg) {
 // HÍBRIDO — base Gemini (logo/escena exactos) + edit OpenAI que corrige
 // SOLO la cara con la selfie. Busca cara real + logo exacto, gratis.
 // ─────────────────────────────────────────────
-async function generateHybrid(prompt, faceImage) {
-  // 1) Base con Gemini: logo/camiseta/balón/escena exactos
-  const base = await generateWithGeminiChain(prompt, faceImage);
-  if (base.type !== 'base64') return base; // por si acaso
+const HYBRID_EDIT_PROMPT =
+  'Image 1 is a finished photo of a person wearing a white KALA soccer jersey in a stadium. ' +
+  'Replace ONLY the face and head of that person with the EXACT face of the person in image 2: ' +
+  'same facial features, exact face shape and width, same facial fullness (do not slim), same eyes ' +
+  'and eye color, nose, mouth, jawline, skin tone, beard/stubble and the same hairstyle and hair length. ' +
+  'Keep EVERYTHING ELSE of image 1 identical — the white KALA jersey and its navy logo, the body, pose, ' +
+  'hands, the colorful ball and the stadium. RE-LIGHT the new face to MATCH the stadium lighting, ' +
+  'exposure, contrast and color temperature of image 1 (do NOT keep the flat indoor/studio lighting of ' +
+  'image 2). Blend skin tone and shadows seamlessly at the hairline, neck and jaw — no seam, no halo, no ' +
+  'cut-out edge. The result must look like ONE single real photograph.';
 
-  // 2) OpenAI edit: reemplaza SOLO la cara por la de la selfie
+/** Paso de face-edit: recibe una imagen base ya generada + la selfie, y reemplaza la cara. */
+async function faceEditOnBase(baseImage, faceImage) {
   const oai = openaiClient();
   const { toFile } = require('openai');
-  const baseFile   = await toFile(Buffer.from(base.data, 'base64'),        'base.png',   { type: base.mimeType || 'image/png' });
+  const baseFile   = await toFile(Buffer.from(baseImage.base64, 'base64'), 'base.jpg',   { type: baseImage.mimeType || 'image/jpeg' });
   const selfieFile = await toFile(Buffer.from(faceImage.base64, 'base64'), 'selfie.jpg', { type: faceImage.mimeType || 'image/jpeg' });
 
-  const editPrompt =
-    'Image 1 is a finished photo of a person wearing a white KALA soccer jersey in a stadium. ' +
-    'Replace ONLY the face and head of that person with the EXACT face of the person in image 2: ' +
-    'same facial features, exact face shape and width, same facial fullness (do not slim), same eyes ' +
-    'and eye color, nose, mouth, jawline, skin tone, beard/stubble and the same hairstyle and hair ' +
-    'length. Keep EVERYTHING ELSE of image 1 identical — the white KALA jersey and its navy logo, the ' +
-    'body, pose, hands, the colorful ball, the stadium and the lighting must not change. Blend the new ' +
-    'face seamlessly with matching skin tone and lighting; it must look like one real photograph.';
-
+  const params = {
+    model:   process.env.OPENAI_IMAGE_MODEL || 'gpt-image-2',
+    image:   [baseFile, selfieFile],
+    prompt:  HYBRID_EDIT_PROMPT,
+    size:    process.env.OPENAI_IMAGE_SIZE || '1024x1536',
+    quality: process.env.OPENAI_IMAGE_QUALITY || 'medium',
+  };
+  let res;
   try {
-    const res = await oai.images.edit({
-      model:   process.env.OPENAI_IMAGE_MODEL || 'gpt-image-2',
-      image:   [baseFile, selfieFile],
-      prompt:  editPrompt,
-      size:    '1024x1536',
-      quality: process.env.OPENAI_IMAGE_QUALITY || 'medium',
-    });
-    const img = res?.data?.[0];
-    if (img?.b64_json) return { type: 'base64', data: img.b64_json, mimeType: 'image/png', model: 'hybrid(gemini+gpt-image-2)' };
-    if (img?.url)      return { type: 'url', url: img.url, model: 'hybrid(gemini+gpt-image-2)' };
+    res = await oai.images.edit({ ...params, output_format: 'jpeg' }); // JPEG = payload liviano
+  } catch (e) {
+    console.warn('[AI] edit con output_format jpeg falló, reintento sin él:', e.message);
+    res = await oai.images.edit(params);
+  }
+  const img = res?.data?.[0];
+  if (img?.b64_json) return { type: 'base64', data: img.b64_json, mimeType: 'image/jpeg', model: 'hybrid-edit(gpt-image-2)' };
+  if (img?.url)      return { type: 'url', url: img.url, model: 'hybrid-edit(gpt-image-2)' };
+  throw new Error('hybrid-edit: sin datos de imagen');
+}
+
+// Híbrido en UN solo paso (Gemini base + face-edit). Útil para pruebas directas.
+async function generateHybrid(prompt, faceImage) {
+  const base = await generateWithGeminiChain(prompt, faceImage);
+  if (base.type !== 'base64') return base;
+  try {
+    return await faceEditOnBase(base, faceImage);
   } catch (err) {
     console.warn('[AI] híbrido: edit de cara falló, devuelvo base Gemini:', err.message);
     base.model = 'hybrid-editfail: ' + String(err.message || err).slice(0, 160);
+    return base;
   }
-  return base; // si el edit falla, al menos devuelve la base Gemini
 }
 
 async function generateForProvider(provider, prompt, faceImage) {
@@ -433,4 +446,4 @@ async function generatePortrait({ positivePrompt, negativePrompt, faceImage }) {
   throw new Error(`No se pudo generar la imagen. Detalle: ${errors.join(' || ')}`);
 }
 
-module.exports = { generatePortrait, generateForProvider, withTimeout, analyzeFace };
+module.exports = { generatePortrait, generateForProvider, faceEditOnBase, withTimeout, analyzeFace };

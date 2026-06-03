@@ -40,6 +40,8 @@ app.post('/api/generate', async (req, res) => {
       mode:         req.body.mode,
       provider:     req.body.provider,
       variant:      req.body.variant,
+      baseImage:    req.body.baseImage,
+      baseMime:     req.body.baseMime,
     });
     res.json({ success: true, ...result });
   } catch (err) {

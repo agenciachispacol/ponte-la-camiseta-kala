@@ -27,6 +27,8 @@ module.exports = async (req, res) => {
       mode:         body.mode,
       provider:     body.provider,
       variant:      body.variant,
+      baseImage:    body.baseImage,
+      baseMime:     body.baseMime,
     });
 
     res.status(200).json({ success: true, ...result });
