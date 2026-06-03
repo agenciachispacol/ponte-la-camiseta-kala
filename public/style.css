@@ -1284,6 +1284,8 @@ button { font-family: var(--font); cursor: pointer; border: none; outline: none;
 /* En pantallas anchas, las 2 versiones lado a lado */
 @media (min-width: 720px) {
   .result-versions { grid-template-columns: 1fr 1fr; }
+  /* Una sola imagen → centrada, no a media pantalla */
+  .result-versions.single { grid-template-columns: minmax(0, 420px); justify-content: center; }
 }
 
 .result-frame {

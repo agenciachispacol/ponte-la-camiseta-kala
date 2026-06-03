@@ -407,12 +407,8 @@ async function generateImage() {
       })
       .catch(err => { console.warn(`[APP] ${label} falló:`, err.message); return { label, provider, error: true, detail: err.message }; });
 
-    // Opción 1 = HÍBRIDO (Gemini logo exacto + OpenAI corrige la cara).
-    // Opción 2 = OpenAI (máxima fidelidad de cara, logo de texto).
-    const settled = await Promise.all([
-      reqOne('hybrid', undefined, 'Opción 1'),
-      reqOne('openai', undefined, 'Opción 2'),
-    ]);
+    // Solo el HÍBRIDO (Gemini logo/cuerpo exactos + OpenAI corrige la cara).
+    const settled = [ await reqOne('hybrid', undefined, 'Tu retrato') ];
 
     if (!settled.some(v => v.imageDataUrl || v.imageUrl)) {
       throw new Error('No se generó ninguna versión.');
@@ -518,6 +514,7 @@ function showResults(versions) {
   cont.innerHTML = '';
 
   const multi = versions.length > 1;
+  cont.classList.toggle('single', !multi);
 
   versions.forEach((v) => {
     const url = v.imageDataUrl || v.imageUrl;
