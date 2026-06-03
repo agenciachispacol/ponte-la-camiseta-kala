@@ -366,6 +366,7 @@ async function generateHybrid(prompt, faceImage) {
     if (img?.url)      return { type: 'url', url: img.url, model: 'hybrid(gemini+gpt-image-2)' };
   } catch (err) {
     console.warn('[AI] híbrido: edit de cara falló, devuelvo base Gemini:', err.message);
+    base.model = 'hybrid-editfail: ' + String(err.message || err).slice(0, 160);
   }
   return base; // si el edit falla, al menos devuelve la base Gemini
 }
