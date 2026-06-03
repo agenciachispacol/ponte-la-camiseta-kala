@@ -19,7 +19,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=20260603-1" />
+  <link rel="stylesheet" href="style.css?v=20260603-2" />
 </head>
 <body>
 
@@ -152,23 +152,11 @@
           <!-- Estado vacío -->
           <div class="upload-empty" id="upload-empty">
             <div class="upload-anim">
-              <span class="pulse-ring"></span>
-              <span class="pulse-ring d2"></span>
-
-              <!-- marco de encuadre (centra tu cara) -->
+              <!-- Guía animada: centra tu cara de frente (Lottie) -->
+              <div id="selfie-lottie" class="lottie-guide" aria-hidden="true"></div>
+              <!-- Fallback estático si Lottie/JS no carga -->
               <span class="fbrk tl"></span><span class="fbrk tr"></span>
               <span class="fbrk bl"></span><span class="fbrk br"></span>
-
-              <div class="upload-icon-ring">
-                <svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <circle cx="40" cy="34" r="14" />
-                  <path d="M10 72c0-16.569 13.431-30 30-30s30 13.431 30 30" />
-                  <path class="up-arrow" d="M40 6v10M35 10l5-5 5 5" stroke-linecap="round"/>
-                </svg>
-              </div>
-
-              <!-- dedo que toca -->
-              <span class="tap-finger" aria-hidden="true">👆</span>
             </div>
 
             <p class="upload-main">Sube tu selfie</p>
@@ -428,6 +416,35 @@
     </div>
   </div>
 
-  <script src="app.js?v=20260603-1"></script>
+  <script src="app.js?v=20260603-2"></script>
+
+  <!-- Guía animada del recuadro de subida (Lottie, autohospedada) -->
+  <script src="assets/lottie/lottie.min.js?v=20260603-2" defer></script>
+  <script>
+    window.addEventListener('load', function () {
+      var box = document.getElementById('selfie-lottie');
+      if (!box || typeof lottie === 'undefined') return;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var anim = lottie.loadAnimation({
+        container: box,
+        renderer: 'svg',
+        loop: true,
+        autoplay: !reduce,
+        path: 'assets/lottie/selfie-frente.json?v=20260603-2'
+      });
+      anim.addEventListener('DOMLoaded', function () {
+        // Oculta el fallback estático (brackets CSS) cuando la animación carga
+        var wrap = box.closest('.upload-anim');
+        if (wrap) wrap.classList.add('lottie-on');
+        if (reduce) anim.goToAndStop(26, true); // frame "cara centrada" fijo
+      });
+      // Pausa cuando el recuadro no está visible (galería abierta o fuera de pantalla)
+      if (!reduce && 'IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) { e.isIntersecting ? anim.play() : anim.pause(); });
+        }, { threshold: 0.1 }).observe(box);
+      }
+    });
+  </script>
 </body>
 </html>
