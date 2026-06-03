@@ -407,9 +407,10 @@ async function generateImage() {
       })
       .catch(err => { console.warn(`[APP] ${label} falló:`, err.message); return { label, provider, error: true, detail: err.message }; });
 
-    // Opción 1 = Gemini, Opción 2 = OpenAI (edit de tu selfie sola → preserva cara).
+    // Opción 1 = HÍBRIDO (Gemini logo exacto + OpenAI corrige la cara).
+    // Opción 2 = OpenAI (máxima fidelidad de cara, logo de texto).
     const settled = await Promise.all([
-      reqOne('gemini', undefined, 'Opción 1'),
+      reqOne('hybrid', undefined, 'Opción 1'),
       reqOne('openai', undefined, 'Opción 2'),
     ]);
 
