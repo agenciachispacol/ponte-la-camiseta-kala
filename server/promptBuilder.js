@@ -85,10 +85,14 @@ const GEMINI_PROMPT_BASE = `
 Ultra-realistic photo of the SAME person from the FIRST reference image (their face), standing
 in a packed nighttime football stadium with floodlights and a green pitch.
 
-KEEP THE FACE IDENTICAL to that first reference image: same face shape and width, same amount of
-facial fat (do NOT slim a full/round face), same eyes and eye color, same nose, mouth, jawline,
-eyebrows, skin tone, beard/stubble and the same hairstyle and hair length. It must clearly be
-the SAME real person — never beautified, slimmed, aged or turned into a model.
+COPY THE FACE — DO NOT RE-IMAGINE IT: Reproduce the face from the first reference image as
+faithfully as if it were a real photograph of that exact same person. Do NOT redraw, restyle,
+average, "improve" or re-imagine the features. Keep the EXACT same face shape and width, the
+same amount of facial fat (do NOT slim a full or round face), the same eyes and eye color, the
+same nose, mouth, lips, jawline, chin, eyebrows, skin tone and skin marks, the same
+beard/stubble, and the same hairstyle and hair length. Keep their real age and weight. The
+result must be unmistakably the SAME person — a friend should recognize them instantly. Never
+beautify, slim, age or turn them into a model/athlete.
 
 Dress them in the WHITE KALA jersey from the SECOND reference image (navy "kala" wordmark across
 the chest, small navy "k" on the upper-right) and have them hold the colorful ball from the
@@ -100,11 +104,10 @@ Natural, anatomically-correct body: realistic shoulders, neck and torso that con
 to the head and match the person's real build — NO distorted, shrunken, oversized, twisted or
 pasted-looking body, no weird neck or floating head. The head sits naturally on the shoulders.
 
-Waist-up shot at a natural distance (not too zoomed): the face is clearly recognizable, the
-KALA logo on the chest and the ball are visible, and the body looks normal and proportionate.
-Cinematic stadium lighting that matches across face, body and background (one cohesive real
-photo, no pasted/cut-out look). Photoreal skin with natural texture. Confident, proud, natural
-stance.
+UPPER-BODY / CHEST-UP shot: the face is LARGE, sharp and clearly recognizable (this is the most
+important part), and the KALA logo on the chest plus the ball are still visible. Cinematic
+stadium lighting matched across face, body and background — one single cohesive real photo,
+no pasted/cut-out look. Photoreal skin with natural texture. Confident, proud, natural stance.
 `.trim();
 
 // ─────────────────────────────────────────────

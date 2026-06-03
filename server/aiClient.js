@@ -111,7 +111,7 @@ async function analyzeFace(faceImg) {
 function buildParts(positivePrompt, faceImg) {
   const parts = [];
   if (faceImg) {
-    parts.push({ text: 'FACE REFERENCE — replicate this exact person\'s face and identity:' });
+    parts.push({ text: 'FACE REFERENCE (image 1) — this is the REAL person. Copy their face EXACTLY as in this photo; do NOT change, restyle or reinvent it:' });
     parts.push(inlinePart(faceImg));
   }
   if (JERSEY_IMG) {
